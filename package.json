@@ -7,6 +7,7 @@
     "dev": "node scripts/generate-resume-pdf.mjs && vite",
     "dev:server": "node server/index.js",
     "dev:full": "concurrently -k \"npm run dev\" \"npm run dev:server\"",
+    "seed": "node scripts/seed-mongo.mjs",
     "build": "node scripts/generate-resume-pdf.mjs && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",

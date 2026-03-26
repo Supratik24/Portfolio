@@ -1,0 +1,132 @@
+{
+  "profile": {
+    "person": {
+      "name": "Supratik Sangram",
+      "kicker": "Full-Stack Web Developer",
+      "tagline": "I build modern web products with clean UI, practical backend systems, and thoughtful user flow.",
+      "bioLine": "Focused on web development with React, JavaScript, Node.js, Express, MongoDB, and product-minded interface design.",
+      "location": "React / Node / MongoDB",
+      "stats": [
+        { "label": "Repos", "value": "5" },
+        { "label": "Focus", "value": "Web Dev" },
+        { "label": "Stack", "value": "MERN" }
+      ]
+    },
+    "socials": {
+      "github": "https://github.com/Supratik24",
+      "email": "supratiksangram9@gmail.com"
+    },
+    "about": {
+      "paragraphs": [
+        "I like building web apps that feel polished on the surface and reliable underneath. Good UI is important to me, but so is the data flow behind it.",
+        "Most of my recent work sits in the full-stack web space: responsive frontends, admin dashboards, REST APIs, MongoDB-backed features, and projects that are easier to extend over time."
+      ],
+      "values": [
+        { "title": "Clarity", "body": "Interfaces should guide people quickly without making them think too hard." },
+        { "title": "Structure", "body": "Clean components, predictable APIs, and sensible data models make projects easier to grow." },
+        { "title": "Speed", "body": "Fast feedback, responsive layouts, and efficient flows make software feel better immediately." },
+        { "title": "Polish", "body": "Small details like spacing, hierarchy, and micro-interactions change how a product is remembered." }
+      ],
+      "toolset": [
+        "React / Vite",
+        "JavaScript / TypeScript",
+        "Node.js / Express",
+        "MongoDB / Mongoose",
+        "Tailwind CSS",
+        "REST APIs",
+        "Responsive UI",
+        "Git / GitHub"
+      ]
+    }
+  },
+  "skills": {
+    "Frontend": ["React", "Vite", "JavaScript", "TypeScript", "HTML5", "CSS3", "Tailwind CSS", "Responsive Design"],
+    "Backend": ["Node.js", "Express", "REST APIs", "JWT Auth", "Role-based Access", "API Integration"],
+    "Database": ["MongoDB", "Mongoose", "CRUD Flows", "Content Models", "Admin Panels"],
+    "Tooling": ["Git", "GitHub", "npm", "Docker Basics", "Postman", "Local Dev Workflows"]
+  },
+  "projects": [
+    {
+      "slug": "luxeva",
+      "title": "Luxeva Commerce Platform",
+      "impactMetric": "React storefront + Node microservices + MongoDB + Redis",
+      "oneLiner": "A full-stack ecommerce platform with a premium storefront, a hidden role-protected admin portal, and service-based backend architecture.",
+      "role": "Full-stack Developer",
+      "tech": ["React", "Node.js", "Express", "MongoDB", "Redis", "Tailwind CSS", "JWT"],
+      "links": { "github": "https://github.com/Supratik24/Luxeva" },
+      "caseStudy": {
+        "problem": "I wanted to build an ecommerce project that felt polished on the frontend while still showing real backend structure and admin capability.",
+        "constraints": [
+          "Support a premium browsing experience with filters, wishlist, cart, checkout, and account flows.",
+          "Keep admin features protected and role-aware instead of mixing them into the public storefront.",
+          "Design the backend so catalog, orders, content, and notifications can evolve independently."
+        ],
+        "approach": [
+          "Built the storefront in React with a strong focus on responsiveness, search, motion, and clean product presentation.",
+          "Split backend responsibilities into gateway and dedicated services for auth, catalog, orders, content, and notifications.",
+          "Used MongoDB for application data and Redis for cache, token invalidation, and event-style coordination."
+        ],
+        "results": [
+          "Created a strong end-to-end web development showcase with both customer and admin experiences.",
+          "Added seed data and local development support so the platform is easier to run and demo.",
+          "Demonstrated practical work across UI, backend APIs, database design, and architecture decisions."
+        ]
+      }
+    },
+    {
+      "slug": "adnode",
+      "title": "Adnode",
+      "impactMetric": "Dashboard-style product with MongoDB analytics and multi-role flows",
+      "oneLiner": "A web platform for decentralized advertising with dashboards for advertisers and hosts, backed by API logic, analytics, and payout workflows.",
+      "role": "Full-stack Developer",
+      "tech": ["Next.js", "TypeScript", "MongoDB", "Tailwind CSS", "REST APIs", "Solidity"],
+      "links": { "github": "https://github.com/Supratik24/Adnode" },
+      "caseStudy": {
+        "problem": "I wanted to turn a complex idea into something users could navigate clearly through dashboards, role-based flows, and readable system feedback.",
+        "constraints": [
+          "Different user roles needed different actions and different surfaces.",
+          "Campaigns, placements, and analytics had to feel understandable rather than overly technical.",
+          "The product had to connect frontend experience with backend logic and persistent data."
+        ],
+        "approach": [
+          "Structured the app around advertiser, host, and viewer flows with dedicated pages and actions.",
+          "Added MongoDB-backed data for users, campaigns, placements, and analytics-oriented features.",
+          "Focused on UI polish, reusable feedback states, and a dashboard experience that still feels product-like."
+        ],
+        "results": [
+          "Built a richer full-stack demo that combines backend workflows with a modern web UI.",
+          "Showed practical experience with data modeling, route design, and multi-role product structure.",
+          "Created a project that stands out visually while still demonstrating technical depth."
+        ]
+      }
+    },
+    {
+      "slug": "portfolio",
+      "title": "Personal Portfolio",
+      "impactMetric": "Responsive single-page portfolio focused on presentation and first impression",
+      "oneLiner": "A personal portfolio project built to showcase projects, contact details, and a cleaner personal brand on the web.",
+      "role": "Frontend Developer",
+      "tech": ["JavaScript", "HTML", "CSS", "Responsive Design", "UI Design"],
+      "links": { "github": "https://github.com/Supratik24/Portfolio" },
+      "caseStudy": {
+        "problem": "A plain GitHub profile does not always communicate design taste or product thinking, so I wanted a cleaner presentation layer for my work.",
+        "constraints": [
+          "The site had to stay simple and lightweight.",
+          "It still needed enough visual identity to feel like a real portfolio instead of a default template.",
+          "Project and contact information had to be easy to scan quickly."
+        ],
+        "approach": [
+          "Focused on layout, spacing, visual hierarchy, and responsive behavior.",
+          "Kept the stack simple so iteration stayed fast while refining the look and feel.",
+          "Treated the portfolio as both a showcase project and a branding exercise."
+        ],
+        "results": [
+          "Created a stronger online first impression for projects and personal work.",
+          "Improved how projects and contact information are presented to recruiters and collaborators.",
+          "Used the project as a base for continued UI experimentation and portfolio upgrades."
+        ]
+      }
+    }
+  ]
+}
+

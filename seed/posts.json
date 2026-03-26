@@ -1,0 +1,21 @@
+[
+  {
+    "title": "Why I like Mongo-backed admin flows",
+    "excerpt": "Admin panels become much more useful when content is editable without touching the frontend code every time.",
+    "body": "One thing I enjoy about Mongo-backed projects is how quickly they let a site move from static to manageable.\\n\\nWhen project cards, skill groups, or homepage content can be edited from an admin flow, the portfolio becomes easier to maintain and far more realistic as a product.\\n\\nIt is a small shift, but it changes the project from a visual demo into something closer to a usable system.",
+    "publishedAt": "2026-03-26T00:00:00.000Z"
+  },
+  {
+    "title": "What makes a web UI feel cleaner",
+    "excerpt": "Most of the difference between average UI and good UI comes from hierarchy, spacing, and knowing what to emphasize.",
+    "body": "A cleaner interface usually does not need more elements. It needs fewer competing priorities.\\n\\nI pay attention to heading rhythm, button weight, spacing consistency, and whether the important action is obvious at a glance. When those basics are handled well, the whole product feels more intentional.\\n\\nThat is the kind of frontend work I enjoy most: not flashy for the sake of it, but polished and readable.",
+    "publishedAt": "2026-03-18T00:00:00.000Z"
+  },
+  {
+    "title": "Building portfolio projects with real structure",
+    "excerpt": "Even personal projects feel stronger when they include realistic data flows, admin features, and thoughtful backend decisions.",
+    "body": "A project becomes more convincing when it shows how the frontend connects to data, auth, content, and maintenance.\\n\\nThat is why I like projects that include dashboards, CRUD operations, protected routes, and database-backed content. They reveal more about how I think as a builder than a static landing page alone.\\n\\nI want portfolio projects to look good, but I also want them to show practical engineering choices.",
+    "publishedAt": "2026-03-10T00:00:00.000Z"
+  }
+]
+

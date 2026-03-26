@@ -9,8 +9,22 @@ Distinctive, editorial-brutalist single-page portfolio with:
 
 ```bash
 npm install
-npm run dev
+npm run dev:full
 ```
+
+## MongoDB (Optional, Recommended)
+
+This portfolio can load `profile`, `skills`, `projects`, and `posts` from MongoDB (managed in `/admin`).
+
+1. Copy `.env.example` to `.env` and set `MONGODB_URI` (must include a DB name).
+2. Seed initial content:
+   ```bash
+   npm run seed
+   ```
+3. Run:
+   ```bash
+   npm run dev:full
+   ```
 
 ## Build
 
