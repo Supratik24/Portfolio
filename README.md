@@ -1,14 +1,21 @@
-# Portfolio
+# Studio Portfolio (React + Vite + TS)
 
-Developer portfolio for Supratik Sangram.
+Distinctive, editorial-brutalist single-page portfolio with:
+- Section reveals, micro-interactions, animated accent shapes
+- Accessible case study modal + command palette (Ctrl/⌘+K)
+- Reduced-motion toggle + accent toggle
 
-Files:
-- `index.html` loads the app in the browser without a build step.
-- `DeveloperPortfolio.jsx` contains the full React portfolio and admin panel in a single file.
-- `start-local.bat` starts a local preview server for the repo.
+## Run
 
-Quick start:
-1. Double-click `start-local.bat`
-2. Open `http://localhost:4174`
+```bash
+npm install
+npm run dev
+```
 
+## Build
+
+```bash
+npm run build
+npm run preview
+```
 

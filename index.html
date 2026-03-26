@@ -3,91 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Developer Portfolio</title>
+    <title>Supratik Sangram - Full-Stack Web Developer</title>
     <meta
       name="description"
-      content="Single-file React developer portfolio with admin dashboard."
+      content="Portfolio of Supratik Sangram, a full-stack web developer focused on React, Node.js, MongoDB, and polished UI."
     />
-    <style>
-      html,
-      body,
-      #root {
-        margin: 0;
-        min-height: 100%;
-        background: #050816;
-      }
 
-      body {
-        font-family: sans-serif;
-      }
+    <meta property="og:title" content="Supratik Sangram - Full-Stack Web Developer" />
+    <meta
+      property="og:description"
+      content="A customized portfolio featuring full-stack web projects, Mongo-backed content, and a refined editorial UI."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og.svg" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Supratik Sangram - Full-Stack Web Developer" />
+    <meta
+      name="twitter:description"
+      content="Portfolio of Supratik Sangram with React, Node.js, MongoDB, and full-stack web development work."
+    />
+    <meta name="twitter:image" content="/og.svg" />
+    <meta name="theme-color" content="#f5efe4" />
 
-      .boot-status {
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        color: #e5e7eb;
-        background:
-          radial-gradient(circle at top, rgba(99, 102, 241, 0.22), transparent 32%),
-          radial-gradient(circle at bottom, rgba(45, 212, 191, 0.18), transparent 24%),
-          #050816;
-      }
-
-      .boot-card {
-        padding: 20px 24px;
-        border-radius: 18px;
-        background: rgba(15, 23, 42, 0.58);
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        backdrop-filter: blur(14px);
-      }
-    </style>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,650&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <div id="root">
-      <div class="boot-status">
-        <div class="boot-card">Loading portfolio…</div>
-      </div>
-    </div>
-
-    <script>
-      (async function bootPortfolio() {
-        const root = document.getElementById("root");
-
-        try {
-          const response = await fetch("./DeveloperPortfolio.jsx");
-          if (!response.ok) {
-            throw new Error("Unable to load DeveloperPortfolio.jsx");
-          }
-
-          let source = await response.text();
-          source = source.replace(
-            /import React,\s*\{\s*useEffect,\s*useRef,\s*useState\s*\}\s*from\s*["']react["'];?/,
-            "const React = window.React; const { useEffect, useRef, useState } = React;"
-          );
-          source = source.replace(
-            /export default function\s+DeveloperPortfolioApp/,
-            "function DeveloperPortfolioApp"
-          );
-          source += "\nwindow.__PortfolioApp = DeveloperPortfolioApp;";
-
-          const transformed = Babel.transform(source, {
-            presets: ["react"],
-            sourceType: "script",
-          }).code;
-
-          const script = document.createElement("script");
-          script.text =
-            transformed +
-            "\nReactDOM.createRoot(document.getElementById('root')).render(React.createElement(window.__PortfolioApp));";
-          document.body.appendChild(script);
-        } catch (error) {
-          console.error(error);
-          root.innerHTML =
-            '<div class="boot-status"><div class="boot-card">Failed to load portfolio. Check the console for details.</div></div>';
-        }
-      })();
-    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
