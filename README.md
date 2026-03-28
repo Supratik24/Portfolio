@@ -1,4 +1,4 @@
-# Supratik Sangram Portfolio
+# Portfolio
 
 A full-stack portfolio built with React, Vite, TypeScript, Node.js, Express, and MongoDB support.
 It showcases projects, skills, writing, resume details, and contact flow with a redesigned aesthetic UI, animated backgrounds, dark mode, case study modals, and admin-ready content management.
