@@ -69,9 +69,22 @@ export function App() {
           const next = data.profile as Partial<SiteProfile>;
           if (next.person && next.socials && next.about) {
             setProfileContent({
-              person: next.person,
-              socials: next.socials,
-              about: next.about,
+              person: {
+                ...siteProfile.person,
+                ...next.person,
+                stats: next.person.stats ?? siteProfile.person.stats,
+              },
+              socials: {
+                ...siteProfile.socials,
+                ...next.socials,
+              },
+              about: {
+                ...siteProfile.about,
+                ...next.about,
+                paragraphs: next.about.paragraphs ?? siteProfile.about.paragraphs,
+                values: next.about.values ?? siteProfile.about.values,
+                toolset: next.about.toolset ?? siteProfile.about.toolset,
+              },
             });
           }
         }
