@@ -5,43 +5,88 @@
   z-index: 0;
 }
 
+.wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.16), transparent 16%),
+    radial-gradient(circle at 82% 14%, rgba(255, 255, 255, 0.11), transparent 16%),
+    radial-gradient(circle at 76% 76%, rgba(255, 255, 255, 0.08), transparent 14%),
+    radial-gradient(circle at 24% 76%, rgba(108, 140, 255, 0.1), transparent 18%);
+  opacity: 0.95;
+}
+
 .cursorGlow {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-      520px 320px at var(--cursor-x, 22%) var(--cursor-y, 18%),
-      rgba(18, 18, 18, 0.11),
+      620px 420px at var(--cursor-x, 22%) var(--cursor-y, 18%),
+      rgba(255, 255, 255, 0.24),
       transparent 62%
     ),
-    radial-gradient(420px 260px at 78% 26%, rgba(18, 18, 18, 0.07), transparent 65%);
-  opacity: 0.9;
+    radial-gradient(620px 340px at 78% 26%, rgba(108, 140, 255, 0.18), transparent 65%),
+    radial-gradient(540px 360px at 16% 76%, rgba(255, 142, 102, 0.16), transparent 66%);
+  opacity: 0.95;
+}
+
+html[data-theme="dark"] .cursorGlow {
+  background: radial-gradient(
+      760px 480px at var(--cursor-x, 22%) var(--cursor-y, 18%),
+      rgba(74, 129, 255, 0.24),
+      transparent 62%
+    ),
+    radial-gradient(660px 380px at 78% 26%, rgba(255, 113, 72, 0.2), transparent 65%),
+    radial-gradient(820px 480px at 16% 76%, rgba(111, 76, 255, 0.18), transparent 66%);
 }
 
 .shapeA,
 .shapeB {
   position: absolute;
-  border-radius: 999px;
-  filter: blur(calc(var(--blur) * 1.1));
-  opacity: 0.5;
-  mix-blend-mode: multiply;
+  border-radius: 44% 56% 58% 42% / 43% 36% 64% 57%;
+  filter: blur(calc(var(--blur) * 1.2));
+  opacity: 0.66;
+  mix-blend-mode: screen;
 }
 
 .shapeA {
-  width: min(540px, 52vw);
-  height: min(540px, 52vw);
-  left: -12%;
-  top: 18%;
-  background: radial-gradient(circle at 30% 30%, rgba(184, 255, 61, 0.75), rgba(184, 255, 61, 0));
-  animation: driftA 12s var(--ease-out) infinite alternate;
+  width: min(620px, 58vw);
+  height: min(620px, 58vw);
+  left: -14%;
+  top: 14%;
+  background:
+    radial-gradient(circle at 34% 30%, rgba(255, 248, 240, 0.92), rgba(255, 248, 240, 0.18) 24%, transparent 56%),
+    radial-gradient(circle at 56% 48%, rgba(108, 140, 255, 0.52), transparent 72%);
+  animation: driftA 16s var(--ease-out) infinite alternate;
 }
 
 .shapeB {
-  width: min(620px, 56vw);
-  height: min(420px, 44vw);
-  right: -14%;
-  top: -10%;
-  background: radial-gradient(circle at 35% 45%, rgba(255, 77, 46, 0.62), rgba(255, 77, 46, 0));
-  animation: driftB 14s var(--ease-out) infinite alternate;
+  width: min(680px, 60vw);
+  height: min(460px, 48vw);
+  right: -12%;
+  top: -6%;
+  background:
+    radial-gradient(circle at 40% 42%, rgba(255, 250, 244, 0.9), rgba(255, 250, 244, 0.18) 22%, transparent 58%),
+    radial-gradient(circle at 58% 46%, rgba(255, 142, 102, 0.46), transparent 70%);
+  animation: driftB 18s var(--ease-out) infinite alternate;
+}
+
+html[data-theme="dark"] .shapeA,
+html[data-theme="dark"] .shapeB {
+  mix-blend-mode: screen;
+  opacity: 0.78;
+}
+
+html[data-theme="dark"] .shapeA {
+  background:
+    radial-gradient(circle at 34% 30%, rgba(89, 168, 255, 0.3), rgba(89, 168, 255, 0.06) 24%, transparent 56%),
+    radial-gradient(circle at 56% 48%, rgba(108, 140, 255, 0.26), transparent 72%);
+}
+
+html[data-theme="dark"] .shapeB {
+  background:
+    radial-gradient(circle at 40% 42%, rgba(255, 124, 81, 0.28), rgba(255, 124, 81, 0.08) 22%, transparent 58%),
+    radial-gradient(circle at 58% 46%, rgba(126, 92, 255, 0.26), transparent 70%);
 }
 
 .scanlines {
@@ -49,30 +94,34 @@
   inset: 0;
   background-image: linear-gradient(
     to bottom,
-    rgba(18, 18, 18, 0.035) 0px,
-    rgba(18, 18, 18, 0.035) 1px,
+    rgba(55, 39, 26, 0.025) 0px,
+    rgba(55, 39, 26, 0.025) 1px,
     transparent 3px
   );
   background-size: 100% 6px;
-  opacity: 0.25;
+  opacity: 0.18;
   mask-image: radial-gradient(80% 60% at 50% 0%, rgba(0, 0, 0, 0.8), transparent 65%);
+}
+
+html[data-theme="dark"] .scanlines {
+  opacity: 0.26;
 }
 
 @keyframes driftA {
   from {
-    transform: translate3d(0, 0, 0) rotate(-6deg);
+    transform: translate3d(0, 0, 0) rotate(-10deg) scale(1);
   }
   to {
-    transform: translate3d(48px, -28px, 0) rotate(10deg);
+    transform: translate3d(54px, -34px, 0) rotate(8deg) scale(1.08);
   }
 }
 
 @keyframes driftB {
   from {
-    transform: translate3d(0, 0, 0) rotate(10deg);
+    transform: translate3d(0, 0, 0) rotate(12deg) scale(1);
   }
   to {
-    transform: translate3d(-44px, 34px, 0) rotate(-6deg);
+    transform: translate3d(-48px, 34px, 0) rotate(-5deg) scale(1.05);
   }
 }
 

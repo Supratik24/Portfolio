@@ -1,7 +1,7 @@
 .wrap {
   min-height: 100vh;
-  background: radial-gradient(1200px 700px at 20% -10%, rgba(18, 18, 18, 0.06), transparent 65%),
-    radial-gradient(900px 500px at 80% 0%, rgba(18, 18, 18, 0.05), transparent 60%),
+  background: radial-gradient(1200px 700px at 20% -10%, rgba(125, 151, 116, 0.12), transparent 65%),
+    radial-gradient(900px 500px at 80% 0%, rgba(213, 137, 98, 0.1), transparent 60%),
     linear-gradient(180deg, var(--paper), var(--paper-2));
 }
 
@@ -13,17 +13,17 @@
 }
 
 .back {
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .logout {
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.5);
   cursor: pointer;
 }
 
@@ -60,7 +60,7 @@
 .card {
   border-radius: var(--radius-l);
   border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(180deg, var(--surface-strong), rgba(255, 246, 238, 0.62));
   box-shadow: var(--shadow-1);
   padding: var(--space-5);
   display: grid;
@@ -94,10 +94,10 @@
 }
 
 .tab {
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid var(--hairline);
-  background: rgba(244, 240, 230, 0.55);
+  background: rgba(255, 255, 255, 0.52);
   cursor: pointer;
   transition: transform var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
 }
@@ -108,9 +108,9 @@
 }
 
 .tabActive {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: var(--accent-ink);
-  border-color: rgba(18, 18, 18, 0.22);
+  border-color: rgba(84, 67, 53, 0.22);
 }
 
 .label {
@@ -127,8 +127,8 @@
   width: 100%;
   border-radius: var(--radius-m);
   border: 1px solid var(--hairline-2);
-  background: rgba(255, 255, 255, 0.65);
-  padding: 12px 12px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 13px 14px;
   outline: none;
   text-transform: none;
   letter-spacing: normal;
@@ -157,12 +157,12 @@
 }
 
 .primary {
-  background: var(--ink);
-  color: var(--paper);
+  background: linear-gradient(135deg, rgba(31, 25, 22, 0.96), rgba(68, 49, 35, 0.94));
+  color: var(--wash);
 }
 
 .secondary {
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .danger {
@@ -193,7 +193,7 @@
   text-align: left;
   border-radius: var(--radius-m);
   border: 1px solid var(--hairline);
-  background: rgba(244, 240, 230, 0.55);
+  background: rgba(255, 255, 255, 0.52);
   padding: 12px;
   cursor: pointer;
 }
@@ -244,7 +244,7 @@
   height: 48px;
   border-radius: var(--radius-m);
   border: 1px solid var(--hairline);
-  background: rgba(244, 240, 230, 0.55);
+  background: rgba(255, 255, 255, 0.52);
   overflow: hidden;
 }
 

@@ -43,7 +43,7 @@ export function Contact(props: { socials: SocialLinks }) {
       if (!res.ok) throw new Error("bad_response");
       setSuccess(true);
     } catch {
-      setSubmitError("Backend is not responding. You can email me directly instead.");
+      setSubmitError("Message could not be sent right now. You can still reach me directly by email.");
     } finally {
       setSending(false);
     }
@@ -65,7 +65,7 @@ export function Contact(props: { socials: SocialLinks }) {
             <div className={styles.socials}>
               {props.socials.email ? (
                 <a className={styles.social} href={`mailto:${props.socials.email}`}>
-                  Email
+                  Mail
                 </a>
               ) : null}
               <a className={styles.social} href={props.socials.github} target="_blank" rel="noreferrer">
@@ -87,15 +87,6 @@ export function Contact(props: { socials: SocialLinks }) {
                 </a>
               ) : null}
             </div>
-            <p className={styles.meta}>
-              Prefer a quick jump? Press <strong>Ctrl/Cmd K</strong>.
-              {!props.socials.email ? (
-                <>
-                  {" "}
-                  (Email is not public on GitHub. Add it in <code>src/content.ts</code> if you want a mailto link.)
-                </>
-              ) : null}
-            </p>
           </div>
         </Reveal>
 
@@ -106,10 +97,10 @@ export function Contact(props: { socials: SocialLinks }) {
             {success ? (
               <div className={styles.success} role="status" aria-live="polite">
                 <div className={styles.successMark} aria-hidden="true" />
-                <div>
-                  <div className={styles.successTitle}>Message queued.</div>
-                  <p className={styles.successBody}>Saved. I will read it and reply to your email.</p>
-                </div>
+                  <div>
+                    <div className={styles.successTitle}>Message queued.</div>
+                    <p className={styles.successBody}>Saved successfully. I will read it and reply to your email.</p>
+                  </div>
                 <button
                   type="button"
                   className={styles.reset}

@@ -52,7 +52,7 @@ export function Hero(props: {
               <div className={styles.note}>
                 <span className={styles.noteMark} aria-hidden="true" />
                 <span>
-                  Press <strong>Ctrl/Cmd K</strong> for a command palette.
+                  Toggle dark mode from the header for the full visual theme.
                 </span>
               </div>
             </div>

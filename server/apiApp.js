@@ -1,4 +1,6 @@
 import "dotenv/config";
+import fs from "node:fs/promises";
+import path from "node:path";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -15,6 +17,7 @@ const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 const NODE_ENV = process.env.NODE_ENV ?? "development";
+const CONTACT_FALLBACK_FILE = path.join(process.cwd(), "server", "data", "contact-messages.json");
 
 if (!MONGODB_URI) {
   // Keep API bootable for frontend-only deployments; DB-backed endpoints will return a clear error.
@@ -85,6 +88,20 @@ export async function ensureDb() {
   }
 
   return connectPromise;
+}
+
+async function saveContactFallback(entry) {
+  await fs.mkdir(path.dirname(CONTACT_FALLBACK_FILE), { recursive: true });
+  let existing = [];
+  try {
+    const raw = await fs.readFile(CONTACT_FALLBACK_FILE, "utf8");
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) existing = parsed;
+  } catch {
+    existing = [];
+  }
+  existing.push(entry);
+  await fs.writeFile(CONTACT_FALLBACK_FILE, JSON.stringify(existing, null, 2), "utf8");
 }
 
 const postSchema = new mongoose.Schema(
@@ -345,10 +362,6 @@ export function createApiApp() {
   });
 
   app.post("/api/contact", async (req, res) => {
-    if (!MONGODB_URI) return res.status(500).json({ error: "missing_mongodb_uri" });
-    if (!dbReady) await ensureDb();
-    if (!dbReady) return res.status(503).json({ error: "db_unavailable" });
-
     const schema = z.object({
       name: z.string().trim().min(2).max(80),
       email: z.string().trim().email().max(120),
@@ -357,8 +370,21 @@ export function createApiApp() {
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) return res.status(400).json({ error: "invalid_body" });
 
-    await ContactMessage.create({ ...parsed.data, createdAt: new Date() });
-    res.status(201).json({ ok: true });
+    const payload = { ...parsed.data, createdAt: new Date() };
+
+    if (!MONGODB_URI) {
+      await saveContactFallback(payload);
+      return res.status(201).json({ ok: true, mode: "file_fallback" });
+    }
+
+    if (!dbReady) await ensureDb();
+    if (!dbReady) {
+      await saveContactFallback(payload);
+      return res.status(201).json({ ok: true, mode: "file_fallback" });
+    }
+
+    await ContactMessage.create(payload);
+    return res.status(201).json({ ok: true, mode: "database" });
   });
 
   app.get("/api/assets/:id", async (req, res) => {

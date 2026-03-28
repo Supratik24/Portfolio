@@ -9,7 +9,8 @@ function scrollToId(id: string, reducedMotion: boolean) {
 
 export function Header(props: {
   name: string;
-  onOpenPalette: () => void;
+  onToggleTheme: () => void;
+  theme: "light" | "dark";
   reducedMotion: boolean;
 }) {
   const nav = sectionOrder.filter((s) => ["work", "about", "experience", "writing", "contact"].includes(s.id));
@@ -46,8 +47,11 @@ export function Header(props: {
         </nav>
 
         <div className={styles.actions}>
-          <button className={styles.paletteButton} type="button" onClick={props.onOpenPalette}>
-            Command <kbd className={styles.kbd}>Ctrl/Cmd K</kbd>
+          <button className={styles.themeButton} type="button" onClick={props.onToggleTheme} aria-label="Toggle dark mode">
+            <span className={styles.themeOrb} aria-hidden="true" />
+            <span className={styles.themeIcon} aria-hidden="true">
+              {props.theme === "dark" ? "☀" : "☾"}
+            </span>
           </button>
         </div>
       </div>

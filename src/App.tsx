@@ -4,11 +4,8 @@ import {
   experience,
   posts,
   projects,
-  resumeLinks,
-  sectionOrder,
   siteProfile,
   skills,
-  type Accent,
   type SiteProfile,
 } from "./content";
 import { Background } from "./components/Background";
@@ -22,11 +19,9 @@ import { Resume } from "./components/Resume";
 import { Writing } from "./components/Writing";
 import { Contact } from "./components/Contact";
 import { CaseStudyModal } from "./components/CaseStudyModal";
-import { CommandPalette, type PaletteAction } from "./components/CommandPalette";
 import { AdminPage } from "./pages/AdminPage";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useLocalStorageState } from "./hooks/useLocalStorageState";
-import { useKeyCombo } from "./hooks/useKeyCombo";
 import styles from "./styles/App.module.css";
 
 function scrollToId(id: string, reducedMotion: boolean) {
@@ -45,8 +40,7 @@ export function App() {
     "full",
   );
   const reducedMotion = motionSetting === "system" ? prefersReducedMotion : motionSetting === "reduced";
-
-  const [accent, setAccent] = useLocalStorageState<Accent>("accent", "acid");
+  const [theme, setTheme] = useLocalStorageState<"light" | "dark">("theme", "light");
 
   const [profileContent, setProfileContent] = useState<SiteProfile>(siteProfile);
   const [projectList, setProjectList] = useState(projects);
@@ -56,11 +50,9 @@ export function App() {
     [activeProjectSlug, projectList],
   );
 
-  const [paletteOpen, setPaletteOpen] = useState(false);
-
   useEffect(() => {
-    document.documentElement.dataset.accent = accent;
-  }, [accent]);
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   useEffect(() => {
     document.documentElement.dataset.motion = reducedMotion ? "reduced" : "full";
@@ -103,128 +95,18 @@ export function App() {
     };
   }, []);
 
-  useKeyCombo(
-    {
-      key: "k",
-      metaKey: true,
-    },
-    () => setPaletteOpen(true),
-    { enabled: !isAdmin },
-  );
-
-  useKeyCombo(
-    {
-      key: "k",
-      ctrlKey: true,
-    },
-    () => setPaletteOpen(true),
-    { enabled: !isAdmin },
-  );
-
-  const paletteActions: PaletteAction[] = useMemo(() => {
-    const jumpActions: PaletteAction[] = sectionOrder.map((s) => ({
-      id: `jump:${s.id}`,
-      label: `Jump to ${s.label}`,
-      group: "Jump",
-      keywords: [s.id, s.label],
-      run: () => scrollToId(s.id, reducedMotion),
-    }));
-
-    const linkActions: PaletteAction[] = [
-      {
-        id: "link:github",
-        label: "Open GitHub",
-        group: "Links",
-        keywords: ["github"],
-        run: () => window.open(profileContent.socials.github, "_blank", "noopener,noreferrer"),
-      },
-      {
-        id: "link:resume",
-        label: "Open Resume (printable)",
-        group: "Links",
-        keywords: ["resume", "cv"],
-        run: () => window.open(resumeLinks.html, "_blank", "noopener,noreferrer"),
-      },
-      {
-        id: "link:resume-pdf",
-        label: "Download Resume (PDF)",
-        group: "Links",
-        keywords: ["resume", "cv", "pdf"],
-        run: () => window.open(resumeLinks.pdf, "_blank", "noopener,noreferrer"),
-      },
-      ...(profileContent.socials.linkedin
-        ? ([
-            {
-              id: "link:linkedin",
-              label: "Open LinkedIn",
-              group: "Links",
-              keywords: ["linkedin"],
-              run: () => window.open(profileContent.socials.linkedin!, "_blank", "noopener,noreferrer"),
-            },
-          ] as const)
-        : []),
-      ...(profileContent.socials.x
-        ? ([
-            {
-              id: "link:x",
-              label: "Open X",
-              group: "Links",
-              keywords: ["x", "twitter"],
-              run: () => window.open(profileContent.socials.x!, "_blank", "noopener,noreferrer"),
-            },
-          ] as const)
-        : []),
-      ...(profileContent.socials.website
-        ? ([
-            {
-              id: "link:website",
-              label: "Open Website",
-              group: "Links",
-              keywords: ["website", "blog"],
-              run: () => window.open(profileContent.socials.website!, "_blank", "noopener,noreferrer"),
-            },
-          ] as const)
-        : []),
-      ...(profileContent.socials.email
-        ? ([
-            {
-              id: "link:email",
-              label: "Email",
-              group: "Links",
-              keywords: ["email", "contact"],
-              run: () => (window.location.href = `mailto:${profileContent.socials.email}`),
-            },
-          ] as const)
-        : []),
-    ];
-
-    const toggleActions: PaletteAction[] = [
-      {
-        id: "toggle:motion",
-        label: reducedMotion ? "Set motion: full" : "Set motion: reduced",
-        group: "Toggles",
-        keywords: ["motion", "reduced", "animation"],
-        run: () => setMotionSetting(reducedMotion ? "full" : "reduced"),
-      },
-      {
-        id: "toggle:accent",
-        label: accent === "acid" ? "Accent: ember" : "Accent: acid",
-        group: "Toggles",
-        keywords: ["accent", "theme", "color"],
-        run: () => setAccent(accent === "acid" ? "ember" : "acid"),
-      },
-    ];
-
-    return [...jumpActions, ...linkActions, ...toggleActions];
-  }, [accent, profileContent.socials, reducedMotion, setAccent, setMotionSetting]);
-
   const home = (
     <div className={styles.app}>
       <a className={styles.skipLink} href="#work">
         Skip to work
       </a>
       <Background reducedMotion={reducedMotion} />
-      <Header name={profileContent.person.name} onOpenPalette={() => setPaletteOpen(true)} reducedMotion={reducedMotion} />
+      <Header
+        name={profileContent.person.name}
+        onToggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")}
+        theme={theme}
+        reducedMotion={reducedMotion}
+      />
 
       <main className={styles.main} id="top">
         <Hero
@@ -261,7 +143,6 @@ export function App() {
       </main>
 
       <CaseStudyModal project={activeProject} onClose={() => setActiveProjectSlug(null)} />
-      <CommandPalette open={paletteOpen} actions={paletteActions} onClose={() => setPaletteOpen(false)} />
     </div>
   );
 

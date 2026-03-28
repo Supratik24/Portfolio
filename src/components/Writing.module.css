@@ -31,17 +31,30 @@
 .card {
   border-radius: var(--radius-l);
   border: 1px solid var(--hairline);
-  background: rgba(255, 255, 255, 0.44);
+  background: linear-gradient(180deg, var(--surface-strong), rgba(255, 246, 238, 0.62));
   box-shadow: var(--shadow-1);
   padding: var(--space-5);
   display: grid;
   gap: var(--space-3);
   transition: transform var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
   position: relative;
+  overflow: hidden;
+}
+
+html[data-theme="dark"] .card {
+  background: linear-gradient(180deg, rgba(21, 25, 33, 0.84), rgba(18, 22, 30, 0.7));
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), transparent 38%);
+  pointer-events: none;
 }
 
 .card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-5px);
   border-color: var(--hairline-2);
 }
 
@@ -70,8 +83,9 @@
 
 .cardTitle {
   margin: 0;
-  font-size: var(--text-xl);
-  letter-spacing: -0.02em;
+  font-size: clamp(25px, 2.8vw, 30px);
+  letter-spacing: -0.04em;
+  font-family: var(--font-head);
   max-width: 38ch;
 }
 

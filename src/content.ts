@@ -79,6 +79,7 @@ export const person: Person = {
 export const socials: SocialLinks = {
   github: "https://github.com/Supratik24",
   email: "supratiksangram9@gmail.com",
+  linkedin: "https://www.linkedin.com/in/supratik26",
 };
 
 export const about: AboutContent = {
@@ -121,6 +122,8 @@ export const resumeSnapshot = {
     email: "supratiksangram9@gmail.com",
     githubLabel: "github.com/Supratik24 (@Supratik24)",
     githubUrl: "https://github.com/Supratik24",
+    linkedinLabel: "linkedin.com/in/supratik26",
+    linkedinUrl: "https://www.linkedin.com/in/supratik26",
   },
   skillChips: ["React", "JavaScript", "TypeScript", "Node.js", "Express", "MongoDB", "Tailwind CSS", "REST APIs"],
   highlights: [

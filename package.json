@@ -4,9 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/generate-resume-pdf.mjs && vite",
+    "dev": "concurrently -k \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "node scripts/generate-resume-pdf.mjs && vite",
     "dev:server": "node server/index.js",
-    "dev:full": "concurrently -k \"npm run dev\" \"npm run dev:server\"",
+    "dev:full": "npm run dev",
     "seed": "node scripts/seed-mongo.mjs",
     "build": "node scripts/generate-resume-pdf.mjs && vite build",
     "preview": "vite preview",
