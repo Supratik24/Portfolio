@@ -128,7 +128,7 @@ export function App() {
           onContact={() => scrollToId("contact", reducedMotion)}
         />
         <Projects projects={projectList} onOpenCaseStudy={(slug) => setActiveProjectSlug(slug)} />
-        <About about={profileContent.about} name={profileContent.person.name} />
+        <About about={profileContent.about} name={profileContent.person.name} portraitUrl={profileContent.person.portraitUrl} />
         <Experience items={experience} />
         <Skills groups={skills} />
         <Resume />

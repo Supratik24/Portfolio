@@ -9,6 +9,7 @@ export function About(props: {
     toolset: string[];
   };
   name: string;
+  portraitUrl?: string;
 }) {
   const [portraitOk, setPortraitOk] = useState(true);
   const initials = props.name
@@ -51,7 +52,7 @@ export function About(props: {
               {portraitOk ? (
                 <img
                   className={styles.portrait}
-                  src="/portrait.jpg"
+                  src={props.portraitUrl ?? "/portrait.jpg"}
                   alt={`Portrait of ${props.name}`}
                   loading="lazy"
                   onError={() => setPortraitOk(false)}

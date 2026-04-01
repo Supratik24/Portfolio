@@ -53,6 +53,14 @@ function getApiErrorCode(error: unknown) {
   return typeof body?.error === "string" ? body.error : "";
 }
 
+function safeParseProfileJson(profileJson: string): SiteProfile | null {
+  try {
+    return JSON.parse(profileJson) as SiteProfile;
+  } catch {
+    return null;
+  }
+}
+
 export function AdminPage() {
   const [token, setTokenState] = useState(() => getToken());
   const [email, setEmail] = useState("");
@@ -120,6 +128,18 @@ export function AdminPage() {
 
   function textFromList(list: readonly string[]) {
     return list.join("\n");
+  }
+
+  function updateProfileJsonPerson(mutator: (person: SiteProfile["person"]) => SiteProfile["person"]) {
+    setProfileJson((current) => {
+      const parsed = safeParseProfileJson(current);
+      if (!parsed) return current;
+      const next = {
+        ...parsed,
+        person: mutator(parsed.person),
+      };
+      return JSON.stringify(next, null, 2);
+    });
   }
 
   function resetPostForm() {
@@ -705,9 +725,57 @@ export function AdminPage() {
                 <>
                   <div className={styles.row}>
                     <h3 className={styles.h3}>Homepage profile</h3>
-                    <button className={styles.primary} type="button" onClick={onSaveProfile} disabled={loading}>
-                      {loading ? "Saving..." : "Save profile"}
-                    </button>
+                    <div className={styles.actions}>
+                      <button className={styles.primary} type="button" onClick={onSaveProfile} disabled={loading}>
+                        {loading ? "Saving..." : "Save profile"}
+                      </button>
+                    </div>
+                  </div>
+                  <div className={styles.card}>
+                    <h4 className={styles.h3}>Profile photo</h4>
+                    <p className={styles.mini}>
+                      Upload a portrait image for the About section. Removing it falls back to <code>/portrait.jpg</code>.
+                    </p>
+                    <div className={styles.actions}>
+                      <label className={styles.secondary}>
+                        Upload photo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: "none" }}
+                          onChange={async (e) => {
+                            const file = e.currentTarget.files?.[0];
+                            if (!file) return;
+                            setLoading(true);
+                            setError(null);
+                            try {
+                              const url = await uploadImage(file);
+                              updateProfileJsonPerson((person) => ({ ...person, portraitUrl: url }));
+                            } catch {
+                              setError("Profile photo upload failed. Keep it small (under ~900KB) and try again.");
+                            } finally {
+                              setLoading(false);
+                              e.currentTarget.value = "";
+                            }
+                          }}
+                        />
+                      </label>
+                      <button
+                        className={styles.danger}
+                        type="button"
+                        disabled={loading}
+                        onClick={() => updateProfileJsonPerson((person) => {
+                          const next = { ...person };
+                          delete next.portraitUrl;
+                          return next;
+                        })}
+                      >
+                        Remove photo
+                      </button>
+                    </div>
+                    <p className={styles.mini}>
+                      Current photo: <code>{siteProfile?.person.portraitUrl ?? "/portrait.jpg"}</code>
+                    </p>
                   </div>
                   <label className={styles.label}>
                     Profile JSON
@@ -903,7 +971,7 @@ export function AdminPage() {
                   Expected shape:{" "}
                   <code>
                     {
-                      '{ "person": { "name": "...", "kicker": "...", "tagline": "...", "bioLine": "...", "location": "...", "stats": [{ "label": "Repos", "value": "5" }] }, "socials": { "github": "https://github.com/...", "email": "you@example.com" }, "about": { "paragraphs": ["..."], "values": [{ "title": "Clarity", "body": "..." }], "toolset": ["React"] } }'
+                      '{ "person": { "name": "...", "kicker": "...", "tagline": "...", "bioLine": "...", "location": "...", "portraitUrl": "https://...", "stats": [{ "label": "Repos", "value": "5" }] }, "socials": { "github": "https://github.com/...", "email": "you@example.com" }, "about": { "paragraphs": ["..."], "values": [{ "title": "Clarity", "body": "..." }], "toolset": ["React"] } }'
                     }
                   </code>
                 </p>

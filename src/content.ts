@@ -47,6 +47,7 @@ export type Person = {
   tagline: string;
   bioLine: string;
   location: string;
+  portraitUrl?: string;
   stats: { label: string; value: string }[];
 };
 

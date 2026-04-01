@@ -176,6 +176,7 @@ const profileSchema = z
       tagline: z.string().min(10).max(180),
       bioLine: z.string().min(10).max(220),
       location: z.string().min(2).max(80),
+      portraitUrl: z.string().url().optional(),
       stats: z
         .array(
           z.object({
