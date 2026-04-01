@@ -48,6 +48,11 @@ async function api<T>(path: string, opts?: RequestInit): Promise<T> {
   return body as T;
 }
 
+function getApiErrorCode(error: unknown) {
+  const body = (error as any)?.body as any;
+  return typeof body?.error === "string" ? body.error : "";
+}
+
 export function AdminPage() {
   const [token, setTokenState] = useState(() => getToken());
   const [email, setEmail] = useState("");
@@ -152,22 +157,63 @@ export function AdminPage() {
 
   async function reloadAll() {
     if (!token) return;
-    const [postsData, site] = await Promise.all([
+    const [postsResult, siteResult, messagesResult] = await Promise.allSettled([
       api<{ posts: AdminPost[] }>("/api/admin/posts", { headers: { Authorization: `Bearer ${token}` } }),
       api<SitePayload>("/api/admin/site", { headers: { Authorization: `Bearer ${token}` } }),
+      api<{ messages: AdminMessage[] }>("/api/admin/messages", { headers: { Authorization: `Bearer ${token}` } }),
     ]);
-    const messagesData = await api<{ messages: AdminMessage[] }>("/api/admin/messages", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    setPosts(postsData.posts);
-    setMessages(messagesData.messages);
-    setActiveMessageId((current) => current ?? messagesData.messages[0]?.id ?? null);
-    setSiteProfile(site.profile ?? null);
-    setSiteSkills(site.skills ?? {});
-    setSiteProjects(Array.isArray(site.projects) ? site.projects : []);
-    setProfileJson(JSON.stringify(site.profile ?? {}, null, 2));
-    setSkillsJson(JSON.stringify(site.skills ?? {}, null, 2));
-    setProjectsJson(JSON.stringify(site.projects ?? [], null, 2));
+
+    if (postsResult.status === "fulfilled") {
+      setPosts(postsResult.value.posts);
+    } else {
+      setPosts([]);
+    }
+
+    if (siteResult.status === "fulfilled") {
+      const site = siteResult.value;
+      setSiteProfile(site.profile ?? null);
+      setSiteSkills(site.skills ?? {});
+      setSiteProjects(Array.isArray(site.projects) ? site.projects : []);
+      setProfileJson(JSON.stringify(site.profile ?? {}, null, 2));
+      setSkillsJson(JSON.stringify(site.skills ?? {}, null, 2));
+      setProjectsJson(JSON.stringify(site.projects ?? [], null, 2));
+    } else {
+      setSiteProfile(null);
+      setSiteSkills({});
+      setSiteProjects([]);
+      setProfileJson("{}");
+      setSkillsJson("{}");
+      setProjectsJson("[]");
+    }
+
+    if (messagesResult.status === "fulfilled") {
+      setMessages(messagesResult.value.messages);
+      setActiveMessageId((current) => current ?? messagesResult.value.messages[0]?.id ?? null);
+    } else {
+      setMessages([]);
+      setActiveMessageId(null);
+    }
+
+    if (postsResult.status === "rejected" || siteResult.status === "rejected") {
+      const failingError = postsResult.status === "rejected" ? postsResult.reason : siteResult.reason;
+      const code = getApiErrorCode(failingError);
+
+      if (code === "missing_mongodb_uri") {
+        setError("MongoDB is not configured, so posts/profile/projects admin data is unavailable. Messages still work below.");
+        return;
+      }
+
+      if (code === "db_unavailable") {
+        setError("MongoDB is configured but unreachable. Messages still work from fallback/local storage.");
+        return;
+      }
+
+      if (messagesResult.status === "rejected") {
+        throw messagesResult.reason;
+      }
+
+      throw failingError;
+    }
   }
 
   useEffect(() => {
@@ -177,8 +223,7 @@ export function AdminPage() {
     reloadAll()
       .catch((e) => {
         const status = (e as any)?.status as number | undefined;
-        const body = (e as any)?.body as any;
-        const code = typeof body?.error === "string" ? body.error : "";
+        const code = getApiErrorCode(e);
 
         if (status === 401 || status === 403) {
           setToken("");
@@ -188,7 +233,7 @@ export function AdminPage() {
         }
 
         if (code === "missing_mongodb_uri") {
-          setError("Backend is running, but MONGODB_URI is missing. Set it in .env and restart the server.");
+          setError("Backend is running, but MONGODB_URI is missing. Messages can still be viewed if they were saved locally.");
           return;
         }
 
