@@ -104,6 +104,16 @@ async function saveContactFallback(entry) {
   await fs.writeFile(CONTACT_FALLBACK_FILE, JSON.stringify(existing, null, 2), "utf8");
 }
 
+async function readContactFallback() {
+  try {
+    const raw = await fs.readFile(CONTACT_FALLBACK_FILE, "utf8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
 const postSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
@@ -516,6 +526,59 @@ export function createApiApp() {
     const deleted = await Post.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ error: "not_found" });
     res.json({ ok: true });
+  });
+
+  app.get("/api/admin/messages", requireAdmin, async (req, res) => {
+    const fallbackMessages = await readContactFallback();
+
+    if (!MONGODB_URI) {
+      return res.json({
+        messages: fallbackMessages
+          .slice()
+          .reverse()
+          .map((m, index) => ({
+            id: `fallback-${index}`,
+            name: String(m.name ?? ""),
+            email: String(m.email ?? ""),
+            message: String(m.message ?? ""),
+            createdAt: new Date(m.createdAt ?? Date.now()).toISOString(),
+            source: "file_fallback",
+          })),
+      });
+    }
+
+    if (!dbReady) await ensureDb();
+
+    const dbMessages = dbReady
+      ? await ContactMessage.find({}, { name: 1, email: 1, message: 1, createdAt: 1 }).sort({ createdAt: -1 }).limit(100).lean()
+      : [];
+
+    const fallbackNormalized = fallbackMessages
+      .slice()
+      .reverse()
+      .map((m, index) => ({
+        id: `fallback-${index}`,
+        name: String(m.name ?? ""),
+        email: String(m.email ?? ""),
+        message: String(m.message ?? ""),
+        createdAt: new Date(m.createdAt ?? Date.now()).toISOString(),
+        source: "file_fallback",
+      }));
+
+    const dbNormalized = dbMessages.map((m) => ({
+      id: String(m._id),
+      name: m.name,
+      email: m.email,
+      message: m.message,
+      createdAt: new Date(m.createdAt).toISOString(),
+      source: "database",
+    }));
+
+    const messages = [...dbNormalized, ...fallbackNormalized].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+    res.json({ messages });
   });
 
   app.get("/api/admin/site", requireAdmin, async (req, res) => {

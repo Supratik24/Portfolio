@@ -16,6 +16,15 @@ type SitePayload = {
   projects: Project[];
 };
 
+type AdminMessage = {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+  source: "database" | "file_fallback";
+};
+
 function getToken() {
   return localStorage.getItem("adminToken") ?? "";
 }
@@ -46,11 +55,17 @@ export function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const [tab, setTab] = useState<"posts" | "profile" | "skills" | "projects" | "json">("posts");
+  const [tab, setTab] = useState<"posts" | "messages" | "profile" | "skills" | "projects" | "json">("posts");
 
   const [posts, setPosts] = useState<AdminPost[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const active = useMemo(() => posts.find((p) => p.id === activeId) ?? null, [activeId, posts]);
+  const [messages, setMessages] = useState<AdminMessage[]>([]);
+  const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
+  const activeMessage = useMemo(
+    () => messages.find((m) => m.id === activeMessageId) ?? messages[0] ?? null,
+    [activeMessageId, messages],
+  );
 
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -141,7 +156,12 @@ export function AdminPage() {
       api<{ posts: AdminPost[] }>("/api/admin/posts", { headers: { Authorization: `Bearer ${token}` } }),
       api<SitePayload>("/api/admin/site", { headers: { Authorization: `Bearer ${token}` } }),
     ]);
+    const messagesData = await api<{ messages: AdminMessage[] }>("/api/admin/messages", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     setPosts(postsData.posts);
+    setMessages(messagesData.messages);
+    setActiveMessageId((current) => current ?? messagesData.messages[0]?.id ?? null);
     setSiteProfile(site.profile ?? null);
     setSiteSkills(site.skills ?? {});
     setSiteProjects(Array.isArray(site.projects) ? site.projects : []);
@@ -489,6 +509,8 @@ export function AdminPage() {
               resetSkillForm();
               resetProjectForm();
               setPosts([]);
+              setMessages([]);
+              setActiveMessageId(null);
               setSiteProfile(null);
               setSiteSkills({});
               setSiteProjects([]);
@@ -539,6 +561,13 @@ export function AdminPage() {
                   onClick={() => setTab("posts")}
                 >
                   Posts
+                </button>
+                <button
+                  type="button"
+                  className={[styles.tab, tab === "messages" ? styles.tabActive : ""].join(" ")}
+                  onClick={() => setTab("messages")}
+                >
+                  Messages
                 </button>
                 <button
                   type="button"
@@ -595,6 +624,33 @@ export function AdminPage() {
                         </button>
                         <button className={styles.danger} type="button" onClick={() => onDelete(p.id)} disabled={loading}>
                           Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : tab === "messages" ? (
+                <>
+                  <div className={styles.row}>
+                    <h3 className={styles.h3}>Latest contact messages</h3>
+                    <button className={styles.secondary} type="button" onClick={() => void reloadAll()} disabled={loading}>
+                      Refresh
+                    </button>
+                  </div>
+                  <div className={styles.list}>
+                    {messages.length === 0 ? <div className={styles.mini}>No messages yet.</div> : null}
+                    {messages.map((m) => (
+                      <div key={m.id} className={styles.item}>
+                        <button
+                          className={styles.itemBtn}
+                          type="button"
+                          onClick={() => setActiveMessageId(m.id)}
+                          disabled={loading}
+                        >
+                          <div className={styles.itemTitle}>{m.name}</div>
+                          <div className={styles.itemMeta}>
+                            {new Date(m.createdAt).toLocaleString()} - {m.email}
+                          </div>
                         </button>
                       </div>
                     ))}
@@ -767,6 +823,30 @@ export function AdminPage() {
                 <p className={styles.mini}>
                   API: <code>/api/posts</code> (public), <code>/api/site/*</code> (public), <code>/api/admin/*</code> (token).
                 </p>
+              </section>
+            ) : tab === "messages" ? (
+              <section className={styles.card}>
+                <h2 className={styles.h2}>Message detail</h2>
+                {activeMessage ? (
+                  <>
+                    <div className={styles.list}>
+                      <div>
+                        <div className={styles.itemTitle}>{activeMessage.name}</div>
+                        <div className={styles.itemMeta}>{activeMessage.email}</div>
+                      </div>
+                      <p className={styles.mini}>
+                        Received: {new Date(activeMessage.createdAt).toLocaleString()}
+                      </p>
+                      <p className={styles.mini}>Source: {activeMessage.source === "database" ? "MongoDB" : "Local fallback file"}</p>
+                    </div>
+                    <label className={styles.label}>
+                      Message
+                      <textarea className={styles.textarea} rows={12} value={activeMessage.message} readOnly />
+                    </label>
+                  </>
+                ) : (
+                  <p className={styles.mini}>No message selected.</p>
+                )}
               </section>
             ) : tab === "profile" ? (
               <section className={styles.card}>
