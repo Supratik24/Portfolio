@@ -168,6 +168,12 @@ const skillsSchema = z
   .record(z.string().min(1), z.array(z.string().min(1)).max(60))
   .refine((v) => Object.keys(v).length <= 30, { message: "too_many_groups" });
 
+const imageRefSchema = z.string().refine((value) => {
+  if (!value) return false;
+  if (value.startsWith("/")) return true;
+  return z.string().url().safeParse(value).success;
+}, { message: "invalid_image_url" });
+
 const profileSchema = z
   .object({
     person: z.object({
@@ -176,7 +182,7 @@ const profileSchema = z
       tagline: z.string().min(10).max(180),
       bioLine: z.string().min(10).max(220),
       location: z.string().min(2).max(80),
-      portraitUrl: z.string().url().optional(),
+      portraitUrl: imageRefSchema.optional(),
       stats: z
         .array(
           z.object({
@@ -613,7 +619,15 @@ export function createApiApp() {
       projects: projectsSchema.optional(),
     });
     const parsed = schema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ error: "invalid_body" });
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: "invalid_body",
+        issues: parsed.error.issues.map((issue) => ({
+          path: issue.path,
+          message: issue.message,
+        })),
+      });
+    }
 
     const update = {
       ...(parsed.data.profile ? { profile: parsed.data.profile } : {}),

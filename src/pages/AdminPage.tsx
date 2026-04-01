@@ -61,6 +61,12 @@ function safeParseProfileJson(profileJson: string): SiteProfile | null {
   }
 }
 
+function formatIssue(issue: { path?: Array<string | number>; message?: string }) {
+  const path = Array.isArray(issue.path) && issue.path.length ? issue.path.join(".") : "profile";
+  const message = issue.message || "Invalid value";
+  return `${path}: ${message}`;
+}
+
 export function AdminPage() {
   const [token, setTokenState] = useState(() => getToken());
   const [email, setEmail] = useState("");
@@ -118,6 +124,7 @@ export function AdminPage() {
   const [profileJson, setProfileJson] = useState("{}");
   const [skillsJson, setSkillsJson] = useState("{}");
   const [projectsJson, setProjectsJson] = useState("[]");
+  const profileDraft = useMemo(() => safeParseProfileJson(profileJson), [profileJson]);
 
   function listFromText(text: string) {
     return text
@@ -132,7 +139,7 @@ export function AdminPage() {
 
   function updateProfileJsonPerson(mutator: (person: SiteProfile["person"]) => SiteProfile["person"]) {
     setProfileJson((current) => {
-      const parsed = safeParseProfileJson(current);
+      const parsed = safeParseProfileJson(current) ?? siteProfile;
       if (!parsed) return current;
       const next = {
         ...parsed,
@@ -362,8 +369,17 @@ export function AdminPage() {
         body: JSON.stringify({ profile }),
       });
       await reloadAll();
-    } catch {
-      setError("Profile save failed. Make sure the JSON is valid.");
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        setError("Profile JSON is invalid. Reset it to the saved version or fix the JSON formatting first.");
+      } else {
+        const issues = (e as any)?.body?.issues as Array<{ path?: Array<string | number>; message?: string }> | undefined;
+        if (Array.isArray(issues) && issues.length > 0) {
+          setError(`Profile save failed. ${formatIssue(issues[0])}`);
+        } else {
+          setError("Profile save failed. Make sure the JSON is valid and the portrait URL points to an uploaded image or full URL.");
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -726,6 +742,14 @@ export function AdminPage() {
                   <div className={styles.row}>
                     <h3 className={styles.h3}>Homepage profile</h3>
                     <div className={styles.actions}>
+                      <button
+                        className={styles.secondary}
+                        type="button"
+                        onClick={() => setProfileJson(JSON.stringify(siteProfile ?? {}, null, 2))}
+                        disabled={loading}
+                      >
+                        Reset JSON
+                      </button>
                       <button className={styles.primary} type="button" onClick={onSaveProfile} disabled={loading}>
                         {loading ? "Saving..." : "Save profile"}
                       </button>
@@ -736,6 +760,22 @@ export function AdminPage() {
                     <p className={styles.mini}>
                       Upload a portrait image for the About section. Removing it falls back to <code>/portrait.jpg</code>.
                     </p>
+                    {(profileDraft ?? siteProfile)?.person?.portraitUrl ? (
+                      <div className={styles.thumbList}>
+                        <div className={styles.thumbRow}>
+                          <div className={styles.thumb} style={{ width: "120px", height: "150px" }}>
+                            <img
+                              className={styles.thumbImg}
+                              src={(profileDraft ?? siteProfile)?.person.portraitUrl}
+                              alt="Profile photo preview"
+                            />
+                          </div>
+                          <p className={styles.mini}>Previewing the selected profile photo. Save profile to publish it.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className={styles.mini}>No uploaded profile photo selected. The site will use <code>/portrait.jpg</code>.</p>
+                    )}
                     <div className={styles.actions}>
                       <label className={styles.secondary}>
                         Upload photo
@@ -774,7 +814,7 @@ export function AdminPage() {
                       </button>
                     </div>
                     <p className={styles.mini}>
-                      Current photo: <code>{siteProfile?.person.portraitUrl ?? "/portrait.jpg"}</code>
+                      Current photo: <code>{profileDraft?.person?.portraitUrl ?? siteProfile?.person.portraitUrl ?? "/portrait.jpg"}</code>
                     </p>
                   </div>
                   <label className={styles.label}>
@@ -786,6 +826,7 @@ export function AdminPage() {
                       onChange={(e) => setProfileJson(e.target.value)}
                     />
                   </label>
+                  {!profileDraft ? <p className={styles.error}>Profile JSON is currently invalid. Upload/remove uses the last saved profile until you reset or fix it.</p> : null}
                   <p className={styles.mini}>
                     This powers the hero, about, footer, and contact identity shown on the homepage.
                   </p>

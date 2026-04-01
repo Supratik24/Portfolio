@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Reveal } from "./Reveal";
 import styles from "./About.module.css";
 
@@ -12,6 +12,10 @@ export function About(props: {
   portraitUrl?: string;
 }) {
   const [portraitOk, setPortraitOk] = useState(true);
+  useEffect(() => {
+    setPortraitOk(true);
+  }, [props.portraitUrl]);
+
   const initials = props.name
     .split(/\s+/)
     .filter(Boolean)
