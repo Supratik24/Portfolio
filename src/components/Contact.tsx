@@ -34,17 +34,21 @@ export function Contact(props: { socials: SocialLinks }) {
 
     setSending(true);
     setSubmitError(null);
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 12000);
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, message }),
+        signal: controller.signal,
       });
       if (!res.ok) throw new Error("bad_response");
       setSuccess(true);
     } catch {
-      setSubmitError("Message could not be sent right now. You can still reach me directly by email.");
+      setSubmitError("Message could not be sent right now. Check backend/MongoDB config or reach me directly by email.");
     } finally {
+      window.clearTimeout(timeout);
       setSending(false);
     }
   }

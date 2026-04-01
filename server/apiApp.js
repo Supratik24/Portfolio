@@ -18,6 +18,7 @@ const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 const NODE_ENV = process.env.NODE_ENV ?? "development";
 const CONTACT_FALLBACK_FILE = path.join(process.cwd(), "server", "data", "contact-messages.json");
+const IS_VERCEL = process.env.VERCEL === "1";
 
 if (!MONGODB_URI) {
   // Keep API bootable for frontend-only deployments; DB-backed endpoints will return a clear error.
@@ -382,19 +383,30 @@ export function createApiApp() {
 
     const payload = { ...parsed.data, createdAt: new Date() };
 
-    if (!MONGODB_URI) {
-      await saveContactFallback(payload);
-      return res.status(201).json({ ok: true, mode: "file_fallback" });
-    }
+    try {
+      if (!MONGODB_URI) {
+        if (IS_VERCEL) {
+          return res.status(503).json({ error: "missing_mongodb_uri" });
+        }
+        await saveContactFallback(payload);
+        return res.status(201).json({ ok: true, mode: "file_fallback" });
+      }
 
-    if (!dbReady) await ensureDb();
-    if (!dbReady) {
-      await saveContactFallback(payload);
-      return res.status(201).json({ ok: true, mode: "file_fallback" });
-    }
+      if (!dbReady) await ensureDb();
+      if (!dbReady) {
+        if (IS_VERCEL) {
+          return res.status(503).json({ error: "db_unavailable" });
+        }
+        await saveContactFallback(payload);
+        return res.status(201).json({ ok: true, mode: "file_fallback" });
+      }
 
-    await ContactMessage.create(payload);
-    return res.status(201).json({ ok: true, mode: "database" });
+      await ContactMessage.create(payload);
+      return res.status(201).json({ ok: true, mode: "database" });
+    } catch (error) {
+      console.error("[server] Contact submit failed:", error?.message ?? String(error));
+      return res.status(500).json({ error: "contact_failed" });
+    }
   });
 
   app.get("/api/assets/:id", async (req, res) => {
