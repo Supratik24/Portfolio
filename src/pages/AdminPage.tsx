@@ -227,7 +227,9 @@ export function AdminPage() {
     }
 
     if (postsResult.status === "rejected" || siteResult.status === "rejected") {
-      const failingError = postsResult.status === "rejected" ? postsResult.reason : siteResult.reason;
+      let failingError: unknown = null;
+      if (postsResult.status === "rejected") failingError = postsResult.reason;
+      else if (siteResult.status === "rejected") failingError = siteResult.reason;
       const code = getApiErrorCode(failingError);
 
       if (code === "missing_mongodb_uri") {
