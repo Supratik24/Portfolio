@@ -67,6 +67,11 @@ function formatIssue(issue: { path?: Array<string | number>; message?: string })
   return `${path}: ${message}`;
 }
 
+function clampPercent(value: number) {
+  if (Number.isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+}
+
 export function AdminPage() {
   const [token, setTokenState] = useState(() => getToken());
   const [email, setEmail] = useState("");
@@ -760,22 +765,103 @@ export function AdminPage() {
                     <p className={styles.mini}>
                       Upload a portrait image for the About section. Removing it falls back to <code>/portrait.jpg</code>.
                     </p>
-                    {(profileDraft ?? siteProfile)?.person?.portraitUrl ? (
+                    {(() => {
+                      const person = (profileDraft ?? siteProfile)?.person;
+                      const url = person?.portraitUrl;
+                      const fit = person?.portraitFit ?? "cover";
+                      const posX = clampPercent(person?.portraitPosX ?? 50);
+                      const posY = clampPercent(person?.portraitPosY ?? 35);
+
+                      return url ? (
                       <div className={styles.thumbList}>
                         <div className={styles.thumbRow}>
                           <div className={styles.thumb} style={{ width: "120px", height: "150px" }}>
                             <img
                               className={styles.thumbImg}
-                              src={(profileDraft ?? siteProfile)?.person.portraitUrl}
+                              src={url}
                               alt="Profile photo preview"
+                              style={{ objectFit: fit, objectPosition: `${posX}% ${posY}%` }}
                             />
                           </div>
                           <p className={styles.mini}>Previewing the selected profile photo. Save profile to publish it.</p>
                         </div>
                       </div>
-                    ) : (
+                      ) : (
                       <p className={styles.mini}>No uploaded profile photo selected. The site will use <code>/portrait.jpg</code>.</p>
-                    )}
+                      );
+                    })()}
+
+                    <div className={styles.row} style={{ alignItems: "end" }}>
+                      <label className={styles.label} style={{ maxWidth: 220 }}>
+                        Fit mode
+                        <select
+                          className={styles.input}
+                          value={(profileDraft ?? siteProfile)?.person?.portraitFit ?? "cover"}
+                          onChange={(e) =>
+                            updateProfileJsonPerson((person) => ({
+                              ...person,
+                              portraitFit: e.currentTarget.value === "contain" ? "contain" : "cover",
+                            }))
+                          }
+                          disabled={loading}
+                        >
+                          <option value="cover">Cover (crop)</option>
+                          <option value="contain">Contain (no crop)</option>
+                        </select>
+                      </label>
+                      <button
+                        className={styles.secondary}
+                        type="button"
+                        disabled={loading}
+                        onClick={() =>
+                          updateProfileJsonPerson((person) => ({
+                            ...person,
+                            portraitFit: "cover",
+                            portraitPosX: 50,
+                            portraitPosY: 35,
+                          }))
+                        }
+                      >
+                        Reset crop
+                      </button>
+                    </div>
+
+                    <label className={styles.label}>
+                      Horizontal position ({Math.round(clampPercent((profileDraft ?? siteProfile)?.person?.portraitPosX ?? 50))}%)
+                      <input
+                        className={styles.input}
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={clampPercent((profileDraft ?? siteProfile)?.person?.portraitPosX ?? 50)}
+                        onChange={(e) =>
+                          updateProfileJsonPerson((person) => ({
+                            ...person,
+                            portraitPosX: clampPercent(Number(e.currentTarget.value)),
+                          }))
+                        }
+                        disabled={loading}
+                      />
+                    </label>
+
+                    <label className={styles.label}>
+                      Vertical position ({Math.round(clampPercent((profileDraft ?? siteProfile)?.person?.portraitPosY ?? 35))}%)
+                      <input
+                        className={styles.input}
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={clampPercent((profileDraft ?? siteProfile)?.person?.portraitPosY ?? 35)}
+                        onChange={(e) =>
+                          updateProfileJsonPerson((person) => ({
+                            ...person,
+                            portraitPosY: clampPercent(Number(e.currentTarget.value)),
+                          }))
+                        }
+                        disabled={loading}
+                      />
+                    </label>
+
                     <div className={styles.actions}>
                       <label className={styles.secondary}>
                         Upload photo

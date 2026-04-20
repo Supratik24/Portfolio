@@ -183,6 +183,9 @@ const profileSchema = z
       bioLine: z.string().min(10).max(220),
       location: z.string().min(2).max(80),
       portraitUrl: imageRefSchema.optional(),
+      portraitFit: z.enum(["cover", "contain"]).optional(),
+      portraitPosX: z.number().min(0).max(100).optional(),
+      portraitPosY: z.number().min(0).max(100).optional(),
       stats: z
         .array(
           z.object({

@@ -48,6 +48,9 @@ export type Person = {
   bioLine: string;
   location: string;
   portraitUrl?: string;
+  portraitFit?: "cover" | "contain";
+  portraitPosX?: number;
+  portraitPosY?: number;
   stats: { label: string; value: string }[];
 };
 

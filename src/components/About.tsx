@@ -10,6 +10,9 @@ export function About(props: {
   };
   name: string;
   portraitUrl?: string;
+  portraitFit?: "cover" | "contain";
+  portraitPosX?: number;
+  portraitPosY?: number;
 }) {
   const [portraitOk, setPortraitOk] = useState(true);
   useEffect(() => {
@@ -59,6 +62,10 @@ export function About(props: {
                   src={props.portraitUrl ?? "/portrait.jpg"}
                   alt={`Portrait of ${props.name}`}
                   loading="lazy"
+                  style={{
+                    objectFit: props.portraitFit ?? "cover",
+                    objectPosition: `${props.portraitPosX ?? 50}% ${props.portraitPosY ?? 35}%`,
+                  }}
                   onError={() => setPortraitOk(false)}
                 />
               ) : (
