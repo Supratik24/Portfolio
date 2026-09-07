@@ -16,6 +16,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "change-me";
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH;
 const JWT_SECRET = process.env.JWT_SECRET ?? "dev-secret-change-me";
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
+const GITHUB_SYNC_SECRET = process.env.GITHUB_SYNC_SECRET ?? "";
 const NODE_ENV = process.env.NODE_ENV ?? "development";
 const CONTACT_FALLBACK_FILE = path.join(process.cwd(), "server", "data", "contact-messages.json");
 const IS_VERCEL = process.env.VERCEL === "1";
@@ -641,6 +642,129 @@ export function createApiApp() {
 
     const updated = await Site.findOneAndUpdate({ key: "main" }, { $set: update }, { upsert: true, new: true }).lean();
     res.json({ ok: true, updatedAt: updated?.updatedAt ?? new Date() });
+  });
+
+  // ─── GitHub Auto-Sync ────────────────────────────────────────────────────
+  // Called by the GitHub Actions workflow whenever you create or push to a repo.
+  // Validates a shared secret, maps GitHub repos → Project shape, then upserts
+  // them into MongoDB without touching manually-curated projects.
+  app.post("/api/admin/github-sync", async (req, res) => {
+    // 1. Validate the shared secret header.
+    if (!GITHUB_SYNC_SECRET) {
+      return res.status(503).json({ error: "github_sync_not_configured" });
+    }
+    const incomingSecret = req.headers["x-sync-secret"] ?? "";
+    if (!incomingSecret || incomingSecret !== GITHUB_SYNC_SECRET) {
+      return res.status(401).json({ error: "invalid_sync_secret" });
+    }
+
+    // 2. Require MongoDB.
+    if (!MONGODB_URI) return res.status(500).json({ error: "missing_mongodb_uri" });
+    if (!dbReady) await ensureDb();
+    if (!dbReady) return res.status(503).json({ error: "db_unavailable" });
+
+    // 3. Validate the incoming repo list.
+    const repoSchema = z.array(
+      z.object({
+        name: z.string().min(1).max(120),
+        full_name: z.string().min(1).max(200),
+        description: z.string().max(500).nullable().optional(),
+        html_url: z.string().url(),
+        homepage: z.string().url().nullable().optional(),
+        topics: z.array(z.string()).optional(),
+        language: z.string().nullable().optional(),
+        stargazers_count: z.number().int().min(0).optional(),
+        fork: z.boolean().optional(),
+        private: z.boolean().optional(),
+        pushed_at: z.string().optional(),
+      })
+    ).max(200);
+
+    const parsed = repoSchema.safeParse(req.body.repos);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "invalid_body", issues: parsed.error.issues });
+    }
+
+    const repos = parsed.data;
+
+    // 4. Helper — turn a repo name like "my-cool-repo" → "My Cool Repo".
+    function formatRepoName(name) {
+      return name
+        .replace(/[-_]/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    // 5. Map each GitHub repo → a Project document shape.
+    //    We keep the mapping minimal so the admin panel can still enrich them.
+    const syncedProjects = repos.map((repo) => {
+      const slug = repo.name.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      const title = formatRepoName(repo.name);
+      const lang = repo.language ? [repo.language] : [];
+      const topicTags = (repo.topics ?? []).slice(0, 10);
+      const tech = [...new Set([...lang, ...topicTags])].slice(0, 20);
+
+      return {
+        slug,
+        title,
+        impactMetric: repo.language ? `${repo.language} · GitHub` : "GitHub Project",
+        oneLiner: repo.description?.trim() || `${title} — a project on GitHub.`,
+        role: "Developer",
+        tech: tech.length > 0 ? tech : ["GitHub"],
+        links: {
+          github: repo.html_url,
+          ...(repo.homepage ? { live: repo.homepage } : {}),
+        },
+        // Mark as GitHub-synced so the admin UI can distinguish these.
+        _githubSynced: true,
+        _syncedAt: new Date().toISOString(),
+      };
+    });
+
+    // 6. Fetch current projects from MongoDB.
+    const site = await getSite();
+    const existingProjects = Array.isArray(site.projects) ? site.projects : [];
+
+    // 7. Merge strategy:
+    //    - Keep all manually-curated projects (those without _githubSynced flag).
+    //    - For synced projects, update if slug already exists, else append.
+    //    - Never delete anything.
+    const manualProjects = existingProjects.filter((p) => !p._githubSynced);
+    const existingSyncedMap = new Map(
+      existingProjects.filter((p) => p._githubSynced).map((p) => [p.slug, p])
+    );
+
+    const mergedSynced = syncedProjects.map((incoming) => {
+      const existing = existingSyncedMap.get(incoming.slug);
+      if (existing) {
+        // Preserve any manual enrichment (caseStudy, coverImage, screenshots)
+        // but refresh the fields that should always reflect GitHub truth.
+        return {
+          ...existing,
+          title: incoming.title,
+          impactMetric: incoming.impactMetric,
+          oneLiner: incoming.oneLiner,
+          tech: incoming.tech,
+          links: incoming.links,
+          _syncedAt: incoming._syncedAt,
+        };
+      }
+      return incoming;
+    });
+
+    const finalProjects = [...manualProjects, ...mergedSynced];
+
+    await Site.findOneAndUpdate(
+      { key: "main" },
+      { $set: { projects: finalProjects, updatedAt: new Date() } },
+      { upsert: true }
+    );
+
+    console.log(`[github-sync] Synced ${syncedProjects.length} repos. Total projects: ${finalProjects.length}.`);
+    return res.json({
+      ok: true,
+      synced: syncedProjects.length,
+      total: finalProjects.length,
+    });
   });
 
   return { app };

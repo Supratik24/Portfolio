@@ -1,0 +1,100 @@
+﻿name: Sync GitHub Repos to Portfolio
+
+on:
+  # Fires when you trigger it manually from the Actions tab.
+  workflow_dispatch:
+
+  # Daily cron at midnight UTC - catches anything missed.
+  schedule:
+    - cron: "0 0 * * *"
+
+  # Fires on every push to main (so initial setup auto-runs).
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sync-github-repos.yml"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch public repos from GitHub API
+        id: fetch_repos
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
+          GITHUB_USERNAME: Supratik24
+        run: |
+          # Fetch all public non-fork repos (up to 100).
+          # To only sync repos tagged with the "portfolio" GitHub topic,
+          # see the commented block below.
+          REPOS=$(curl -sf \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/users/$GITHUB_USERNAME/repos?type=public&sort=pushed&per_page=100"
+          )
+
+          # ── Optional: only sync repos tagged with topic "portfolio" ─────────
+          # Uncomment and replace the REPOS block above with this to filter by topic:
+          #
+          # REPOS=$(curl -sf \
+          #   -H "Authorization: Bearer $GH_TOKEN" \
+          #   -H "Accept: application/vnd.github+json" \
+          #   -H "X-GitHub-Api-Version: 2022-11-28" \
+          #   "https://api.github.com/search/repositories?q=user:$GITHUB_USERNAME+topic:portfolio&per_page=100" \
+          # | jq ".items")
+          # ────────────────────────────────────────────────────────────────────
+
+          # Filter out forks and the portfolio repo itself.
+          FILTERED=$(echo "$REPOS" | jq '[
+            .[] |
+            select(.fork == false) |
+            select(.name != "Portfolio") |
+            {
+              name,
+              full_name,
+              description,
+              html_url,
+              homepage: (if .homepage != "" then .homepage else null end),
+              topics,
+              language,
+              stargazers_count,
+              fork,
+              private,
+              pushed_at
+            }
+          ]')
+
+          COUNT=$(echo "$FILTERED" | jq length)
+          echo "Found $COUNT repos to sync."
+          echo "$FILTERED" > /tmp/repos.json
+
+      - name: POST repos to portfolio sync endpoint
+        env:
+          PORTFOLIO_API_URL: ${{ secrets.PORTFOLIO_API_URL }}
+          PORTFOLIO_SYNC_SECRET: ${{ secrets.PORTFOLIO_SYNC_SECRET }}
+        run: |
+          if [ -z "$PORTFOLIO_API_URL" ]; then
+            echo "PORTFOLIO_API_URL secret not set. Skipping sync."
+            exit 0
+          fi
+
+          PAYLOAD=$(jq -n --slurpfile repos /tmp/repos.json '{"repos": $repos[0]}')
+
+          HTTP_STATUS=$(curl -s -o /tmp/response.json -w "%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "x-sync-secret: $PORTFOLIO_SYNC_SECRET" \
+            "$PORTFOLIO_API_URL/api/admin/github-sync" \
+            -d "$PAYLOAD"
+          )
+
+          echo "HTTP $HTTP_STATUS"
+          cat /tmp/response.json
+
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "Sync failed with status $HTTP_STATUS"
+            exit 1
+          fi
+
+          echo "Sync complete - $(jq .synced /tmp/response.json) repos synced."
