@@ -97,7 +97,11 @@ export function App() {
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!data || cancelled) return;
-        if (Array.isArray(data.projects)) setProjectList(data.projects);
+        // Only use MongoDB projects if the DB has at least one entry.
+        // An empty array means the DB is fresh/unavailable — keep static fallback.
+        if (Array.isArray(data.projects) && data.projects.length > 0) {
+          setProjectList(data.projects);
+        }
       })
       .catch(() => {
         // ignore; fallback to static projects
