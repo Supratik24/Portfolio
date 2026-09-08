@@ -253,6 +253,8 @@ const projectSchema = z
         results: z.array(z.string().min(2).max(220)).min(1).max(12),
       })
       .optional(),
+    _githubSynced: z.boolean().optional(),
+    _syncedAt: z.string().optional(),
   })
   .strict();
 
@@ -729,12 +731,16 @@ export function createApiApp() {
     //    - For synced projects, update if slug already exists, else append.
     //    - Never delete anything.
     const manualProjects = existingProjects.filter((p) => !p._githubSynced);
+    const manualSlugs = new Set(manualProjects.map((p) => p.slug));
+
     const existingSyncedMap = new Map(
       existingProjects.filter((p) => p._githubSynced).map((p) => [p.slug, p])
     );
 
-    const mergedSynced = syncedProjects.map((incoming) => {
-      const existing = existingSyncedMap.get(incoming.slug);
+    const mergedSynced = syncedProjects
+      .filter((incoming) => !manualSlugs.has(incoming.slug)) // skip if manual project already exists!
+      .map((incoming) => {
+        const existing = existingSyncedMap.get(incoming.slug);
       if (existing) {
         // Preserve any manual enrichment (caseStudy, coverImage, screenshots)
         // but refresh the fields that should always reflect GitHub truth.
