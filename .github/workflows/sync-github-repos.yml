@@ -1,4 +1,4 @@
-﻿name: Sync GitHub Repos to Portfolio
+name: Sync GitHub Repos to Portfolio
 
 on:
   # Fires when you trigger it manually from the Actions tab.
@@ -24,25 +24,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
           GITHUB_USERNAME: Supratik24
         run: |
-          # Fetch all public non-fork repos (up to 100).
-          # To only sync repos tagged with the "portfolio" GitHub topic,
-          # see the commented block below.
+          # ── Filter to only repos tagged with the "portfolio" topic ─────────
+          # This ensures that random/test repos don't show up on your website.
           REPOS=$(curl -sf \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/users/$GITHUB_USERNAME/repos?type=public&sort=pushed&per_page=100"
-          )
-
-          # ── Optional: only sync repos tagged with topic "portfolio" ─────────
-          # Uncomment and replace the REPOS block above with this to filter by topic:
-          #
-          # REPOS=$(curl -sf \
-          #   -H "Authorization: Bearer $GH_TOKEN" \
-          #   -H "Accept: application/vnd.github+json" \
-          #   -H "X-GitHub-Api-Version: 2022-11-28" \
-          #   "https://api.github.com/search/repositories?q=user:$GITHUB_USERNAME+topic:portfolio&per_page=100" \
-          # | jq ".items")
+            "https://api.github.com/search/repositories?q=user:$GITHUB_USERNAME+topic:portfolio&per_page=100" \
+          | jq ".items")
           # ────────────────────────────────────────────────────────────────────
 
           # Filter out forks and the portfolio repo itself.
