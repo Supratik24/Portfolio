@@ -100,6 +100,10 @@ export function AdminPage() {
   const [siteSkills, setSiteSkills] = useState<Record<string, string[]>>({});
   const [siteProjects, setSiteProjects] = useState<Project[]>([]);
 
+  const [githubModalOpen, setGithubModalOpen] = useState(false);
+  const [githubRepos, setGithubRepos] = useState<any[]>([]);
+  const [githubLoading, setGithubLoading] = useState(false);
+
   const [activeSkillGroup, setActiveSkillGroup] = useState<string | null>(null);
   const [skillGroupName, setSkillGroupName] = useState("");
   const [skillItemsText, setSkillItemsText] = useState("");
@@ -580,6 +584,49 @@ export function AdminPage() {
     resetProjectForm();
   }
 
+  async function fetchGithubRepos() {
+    setGithubLoading(true);
+    setGithubModalOpen(true);
+    try {
+      const username = siteProfile?.socials?.github?.split("/").pop() || "Supratik24";
+      const res = await fetch(`https://api.github.com/users/${username}/repos?type=public&sort=pushed&per_page=100`);
+      if (!res.ok) throw new Error("Failed to fetch GitHub repos");
+      const data = await res.json();
+      setGithubRepos(data.filter((r: any) => !r.fork));
+    } catch (err: any) {
+      alert("GitHub fetch error: " + err.message);
+    } finally {
+      setGithubLoading(false);
+    }
+  }
+
+  function addRepoAsProject(repo: any) {
+    const slug = repo.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    if (siteProjects.some((p) => p.slug === slug)) {
+      alert(`Project with slug "${slug}" already exists!`);
+      return;
+    }
+
+    const newProj: Project = {
+      slug,
+      title: repo.name,
+      impactMetric: repo.description || "GitHub Repository",
+      oneLiner: repo.description || "",
+      role: "Developer",
+      tech: [repo.language, ...(repo.topics || [])].filter(Boolean) as string[],
+      links: {
+        github: repo.html_url,
+      },
+    };
+    if (repo.homepage) {
+      newProj.links.live = repo.homepage;
+    }
+
+    setSiteProjects((prev) => [...prev, newProj]);
+    setGithubModalOpen(false);
+    setActiveProjectSlug(slug);
+  }
+
   return (
     <div className={styles.wrap}>
       <div className={styles.topbar}>
@@ -964,6 +1011,9 @@ export function AdminPage() {
                   <div className={styles.row}>
                     <h3 className={styles.h3}>Projects</h3>
                     <div className={styles.actions}>
+                      <button className={styles.secondary} type="button" onClick={fetchGithubRepos} disabled={loading}>
+                        Import from GitHub
+                      </button>
                       <button className={styles.secondary} type="button" onClick={resetProjectForm} disabled={loading}>
                         New
                       </button>
@@ -972,6 +1022,46 @@ export function AdminPage() {
                       </button>
                     </div>
                   </div>
+
+                  {githubModalOpen && (
+                    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.8)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+                      <div style={{ background: "#111", border: "1px solid #333", borderRadius: "12px", padding: "1.5rem", width: "100%", maxWidth: "600px", maxHeight: "80vh", overflowY: "auto" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+                          <h3 className={styles.h3} style={{ margin: 0 }}>Import GitHub Repo</h3>
+                          <button className={styles.danger} onClick={() => setGithubModalOpen(false)}>Close</button>
+                        </div>
+                        {githubLoading ? (
+                          <p style={{ color: "#aaa" }}>Loading your GitHub repositories...</p>
+                        ) : githubRepos.length === 0 ? (
+                          <p style={{ color: "#aaa" }}>No public repos found.</p>
+                        ) : (
+                          <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                            {githubRepos.map(r => {
+                              const slug = r.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                              const added = siteProjects.some(p => p.slug === slug);
+                              return (
+                                <div key={r.id} style={{ border: "1px solid #222", padding: "1rem", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                  <div>
+                                    <div style={{ fontWeight: "bold", fontSize: "1.1rem" }}>{r.name}</div>
+                                    <div style={{ fontSize: "0.85rem", color: "#888", marginTop: "4px" }}>
+                                      {r.language || "No language"} {r.stargazers_count > 0 && `• ⭐ ${r.stargazers_count}`}
+                                    </div>
+                                  </div>
+                                  <button 
+                                    className={added ? styles.secondary : styles.primary} 
+                                    onClick={() => addRepoAsProject(r)}
+                                    disabled={added}
+                                  >
+                                    {added ? "Added" : "Add to Portfolio"}
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <div className={styles.list}>
                     {siteProjects.length === 0 ? <div className={styles.mini}>No projects yet.</div> : null}
                     {siteProjects.map((p) => (
