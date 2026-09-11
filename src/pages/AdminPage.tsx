@@ -551,8 +551,8 @@ export function AdminPage() {
       role: projRole.trim(),
       tech: Array.from(new Set(listFromText(projTechText))).slice(0, 20),
       links: {
-        ...(projLive.trim() ? { live: projLive.trim() } : {}),
-        ...(projGithub.trim() ? { github: projGithub.trim() } : {}),
+        ...(projLive.trim() ? { live: projLive.trim().startsWith("http") ? projLive.trim() : "https://" + projLive.trim() } : {}),
+        ...(projGithub.trim() ? { github: projGithub.trim().startsWith("http") ? projGithub.trim() : "https://" + projGithub.trim() } : {}),
       },
       ...(projCoverImage.trim() ? { coverImage: projCoverImage.trim() } : {}),
       ...(projScreenshots.length ? { screenshots: projScreenshots.slice(0, 8) } : {}),
