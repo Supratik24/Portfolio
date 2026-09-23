@@ -35,28 +35,6 @@ export function Hero(props: {
             </div>
           </div>
 
-          <aside className={styles.right} aria-label="Quick stats">
-            <div className={styles.panel}>
-              <div className={styles.panelTop}>
-                <span className={styles.panelLabel}>Now</span>
-                <span className={styles.panelValue}>{props.person.location}</span>
-              </div>
-              <div className={styles.stats}>
-                {props.person.stats.map((s) => (
-                  <div key={s.label} className={styles.stat}>
-                    <div className={styles.statValue}>{s.value}</div>
-                    <div className={styles.statLabel}>{s.label}</div>
-                  </div>
-                ))}
-              </div>
-              <div className={styles.note}>
-                <span className={styles.noteMark} aria-hidden="true" />
-                <span>
-                  Toggle dark mode from the header for the full visual theme.
-                </span>
-              </div>
-            </div>
-          </aside>
         </div>
       </Reveal>
     </section>

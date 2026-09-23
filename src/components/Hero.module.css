@@ -242,7 +242,6 @@ html[data-theme="dark"] .stat {
 
 @media (min-width: 920px) {
   .grid {
-    grid-template-columns: 1.25fr 0.75fr;
     gap: var(--space-7);
     align-items: start;
   }
