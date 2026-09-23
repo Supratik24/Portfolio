@@ -396,41 +396,6 @@ export function AdminPage() {
     }
   }
 
-  async function onSaveSkills() {
-    if (!token) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await api<{ ok: true }>("/api/admin/site", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ skills: siteSkills }),
-      });
-      await reloadAll();
-    } catch {
-      setError("Skills save failed. Validate fields and check server logs.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onSaveProjects() {
-    if (!token) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await api<{ ok: true }>("/api/admin/site", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ projects: siteProjects }),
-      });
-      await reloadAll();
-    } catch {
-      setError("Projects save failed. Validate fields and check server logs.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function onLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -504,33 +469,64 @@ export function AdminPage() {
     }
   }
 
-  function onUpsertSkillGroup() {
+  async function onUpsertSkillGroup() {
     const name = skillGroupName.trim();
     if (!name) {
       setError("Group name is required.");
       return;
     }
     const items = Array.from(new Set(listFromText(skillItemsText))).slice(0, 60);
+    
+    let newSkills: Record<string, string[]> = {};
     setSiteSkills((prev) => {
-      const next: Record<string, string[]> = { ...prev };
-      if (activeSkillGroup && activeSkillGroup !== name) delete next[activeSkillGroup];
-      next[name] = items;
-      return next;
+      newSkills = { ...prev };
+      if (activeSkillGroup && activeSkillGroup !== name) delete newSkills[activeSkillGroup];
+      newSkills[name] = items;
+      return newSkills;
     });
     setActiveSkillGroup(name);
+
+    if (!token) return;
+    setLoading(true);
+    try {
+      await api<{ ok: true }>("/api/admin/site", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ skills: newSkills }),
+      });
+    } catch {
+      setError("Auto-save failed. Check logs.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function onDeleteSkillGroup(group: string) {
+  async function onDeleteSkillGroup(group: string) {
     if (!confirm(`Delete skill group "${group}"?`)) return;
+    let newSkills: Record<string, string[]> = {};
     setSiteSkills((prev) => {
-      const next: Record<string, string[]> = { ...prev };
-      delete next[group];
-      return next;
+      newSkills = { ...prev };
+      delete newSkills[group];
+      return newSkills;
     });
     resetSkillForm();
+
+    if (!token) return;
+    setLoading(true);
+    try {
+      await api<{ ok: true }>("/api/admin/site", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ skills: newSkills }),
+      });
+    } catch {
+      setError("Auto-delete failed. Check logs.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function onUpsertProject() {
+  async function onUpsertProject() {
     const slug = projSlug.trim();
     if (!slug) {
       setError("Project slug is required.");
@@ -568,20 +564,53 @@ export function AdminPage() {
         : {}),
     };
 
+    let newProjects: Project[] = [];
     setSiteProjects((prev) => {
       const idx = prev.findIndex((p) => p.slug === activeProjectSlug);
-      if (idx === -1) return [next, ...prev];
-      const copy = prev.slice();
-      copy[idx] = next;
-      return copy;
+      if (idx === -1) newProjects = [next, ...prev];
+      else {
+        const copy = prev.slice();
+        copy[idx] = next;
+        newProjects = copy;
+      }
+      return newProjects;
     });
     setActiveProjectSlug(slug);
+
+    if (!token) return;
+    setLoading(true);
+    try {
+      await api<{ ok: true }>("/api/admin/site", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ projects: newProjects }),
+      });
+    } catch {
+      setError("Auto-save failed. Check logs.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function onDeleteProject(slug: string) {
+  async function onDeleteProject(slug: string) {
     if (!confirm(`Delete project "${slug}"?`)) return;
-    setSiteProjects((prev) => prev.filter((p) => p.slug !== slug));
+    const newProjects = siteProjects.filter((p) => p.slug !== slug);
+    setSiteProjects(newProjects);
     resetProjectForm();
+
+    if (!token) return;
+    setLoading(true);
+    try {
+      await api<{ ok: true }>("/api/admin/site", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ projects: newProjects }),
+      });
+    } catch {
+      setError("Auto-delete failed. Check logs.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function fetchGithubRepos() {
@@ -600,7 +629,7 @@ export function AdminPage() {
     }
   }
 
-  function addRepoAsProject(repo: any) {
+  async function addRepoAsProject(repo: any) {
     const slug = repo.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     if (siteProjects.some((p) => p.slug === slug)) {
       alert(`Project with slug "${slug}" already exists!`);
@@ -622,9 +651,24 @@ export function AdminPage() {
       newProj.links.live = repo.homepage;
     }
 
-    setSiteProjects((prev) => [...prev, newProj]);
+    const newProjects = [...siteProjects, newProj];
+    setSiteProjects(newProjects);
     setGithubModalOpen(false);
     setActiveProjectSlug(slug);
+
+    if (!token) return;
+    setLoading(true);
+    try {
+      await api<{ ok: true }>("/api/admin/site", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ projects: newProjects }),
+      });
+    } catch {
+      setError("Auto-save failed. Check logs.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -971,11 +1015,8 @@ export function AdminPage() {
                   <div className={styles.row}>
                     <h3 className={styles.h3}>Skill groups</h3>
                     <div className={styles.actions}>
-                      <button className={styles.secondary} type="button" onClick={resetSkillForm} disabled={loading}>
-                        New
-                      </button>
-                      <button className={styles.primary} type="button" onClick={onSaveSkills} disabled={loading}>
-                        {loading ? "Saving..." : "Save skills"}
+                      <button className={styles.primary} type="button" onClick={resetSkillForm} disabled={loading}>
+                        New Skill Group
                       </button>
                     </div>
                   </div>
@@ -1014,11 +1055,8 @@ export function AdminPage() {
                       <button className={styles.secondary} type="button" onClick={fetchGithubRepos} disabled={loading}>
                         Import from GitHub
                       </button>
-                      <button className={styles.secondary} type="button" onClick={resetProjectForm} disabled={loading}>
-                        New
-                      </button>
-                      <button className={styles.primary} type="button" onClick={onSaveProjects} disabled={loading}>
-                        {loading ? "Saving..." : "Save projects"}
+                      <button className={styles.primary} type="button" onClick={resetProjectForm} disabled={loading}>
+                        New Project
                       </button>
                     </div>
                   </div>
@@ -1213,7 +1251,7 @@ export function AdminPage() {
                 </label>
                 <div className={styles.actions}>
                   <button className={styles.primary} type="button" onClick={onUpsertSkillGroup} disabled={loading}>
-                    {activeSkillGroup ? "Update group" : "Add group"}
+                    {activeSkillGroup ? "Save Group" : "Add Group"}
                   </button>
                   {activeSkillGroup ? (
                     <button className={styles.secondary} type="button" onClick={resetSkillForm} disabled={loading}>
@@ -1221,7 +1259,6 @@ export function AdminPage() {
                     </button>
                   ) : null}
                 </div>
-                <p className={styles.mini}>Tip: edit locally, then hit “Save skills” to persist to MongoDB.</p>
               </section>
             ) : tab === "projects" ? (
               <section className={styles.card}>
@@ -1397,7 +1434,7 @@ export function AdminPage() {
                 ) : null}
                 <div className={styles.actions}>
                   <button className={styles.primary} type="button" onClick={onUpsertProject} disabled={loading}>
-                    {activeProjectSlug ? "Update project" : "Add project"}
+                    {activeProjectSlug ? "Save Project" : "Add Project"}
                   </button>
                   {activeProjectSlug ? (
                     <button className={styles.secondary} type="button" onClick={resetProjectForm} disabled={loading}>
@@ -1405,7 +1442,6 @@ export function AdminPage() {
                     </button>
                   ) : null}
                 </div>
-                <p className={styles.mini}>Tip: edit locally, then hit “Save projects” to persist to MongoDB.</p>
               </section>
             ) : (
               <section className={styles.card}>
