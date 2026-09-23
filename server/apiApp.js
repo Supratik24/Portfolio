@@ -222,12 +222,12 @@ const profileSchema = z
 
 const projectSchema = z
   .object({
-    slug: z.string().min(2).max(60),
-    title: z.string().min(2).max(120),
-    impactMetric: z.string().min(2).max(140),
-    oneLiner: z.string().min(5).max(240),
-    role: z.string().min(2).max(80),
-    tech: z.array(z.string().min(1)).min(1).max(20),
+    slug: z.string().min(1).max(100),
+    title: z.string().min(1).max(120),
+    impactMetric: z.string().max(200).optional().default(""),
+    oneLiner: z.string().max(500).optional().default(""),
+    role: z.string().max(80).optional().default(""),
+    tech: z.array(z.string()).max(40).optional().default([]),
     links: z
       .object({
         live: z.string().url().optional(),
@@ -239,24 +239,24 @@ const projectSchema = z
       .array(
         z.object({
           src: z.string().url(),
-          caption: z.string().min(1).max(140).optional(),
+          caption: z.string().max(140).optional(),
         }),
       )
       .max(8)
       .optional(),
-    // Optional case study; if omitted the UI will still show the card but the case study modal should be disabled.
     caseStudy: z
       .object({
-        problem: z.string().min(10).max(1200),
-        constraints: z.array(z.string().min(2).max(220)).min(1).max(12),
-        approach: z.array(z.string().min(2).max(220)).min(1).max(12),
-        results: z.array(z.string().min(2).max(220)).min(1).max(12),
+        problem: z.string().max(3000),
+        constraints: z.array(z.string().max(500)).max(20),
+        approach: z.array(z.string().max(500)).max(20),
+        results: z.array(z.string().max(500)).max(20),
       })
       .optional(),
     _githubSynced: z.boolean().optional(),
     _syncedAt: z.string().optional(),
   })
   .strict();
+
 
 const projectsSchema = z.array(projectSchema).max(40);
 
