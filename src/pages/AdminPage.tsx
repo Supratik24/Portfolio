@@ -477,13 +477,11 @@ export function AdminPage() {
     }
     const items = Array.from(new Set(listFromText(skillItemsText))).slice(0, 60);
     
-    let newSkills: Record<string, string[]> = {};
-    setSiteSkills((prev) => {
-      newSkills = { ...prev };
-      if (activeSkillGroup && activeSkillGroup !== name) delete newSkills[activeSkillGroup];
-      newSkills[name] = items;
-      return newSkills;
-    });
+    const newSkills = { ...siteSkills };
+    if (activeSkillGroup && activeSkillGroup !== name) delete newSkills[activeSkillGroup];
+    newSkills[name] = items;
+    
+    setSiteSkills(newSkills);
     setActiveSkillGroup(name);
 
     if (!token) return;
@@ -503,12 +501,10 @@ export function AdminPage() {
 
   async function onDeleteSkillGroup(group: string) {
     if (!confirm(`Delete skill group "${group}"?`)) return;
-    let newSkills: Record<string, string[]> = {};
-    setSiteSkills((prev) => {
-      newSkills = { ...prev };
-      delete newSkills[group];
-      return newSkills;
-    });
+    const newSkills = { ...siteSkills };
+    delete newSkills[group];
+    
+    setSiteSkills(newSkills);
     resetSkillForm();
 
     if (!token) return;
@@ -564,17 +560,16 @@ export function AdminPage() {
         : {}),
     };
 
-    let newProjects: Project[] = [];
-    setSiteProjects((prev) => {
-      const idx = prev.findIndex((p) => p.slug === activeProjectSlug);
-      if (idx === -1) newProjects = [next, ...prev];
-      else {
-        const copy = prev.slice();
-        copy[idx] = next;
-        newProjects = copy;
-      }
-      return newProjects;
-    });
+    let newProjects: Project[];
+    const idx = siteProjects.findIndex((p) => p.slug === activeProjectSlug);
+    if (idx === -1) {
+      newProjects = [next, ...siteProjects];
+    } else {
+      newProjects = siteProjects.slice();
+      newProjects[idx] = next;
+    }
+    
+    setSiteProjects(newProjects);
     setActiveProjectSlug(slug);
 
     if (!token) return;
