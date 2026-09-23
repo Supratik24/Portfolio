@@ -124,9 +124,9 @@ body {
   line-height: 1.55;
   color: var(--ink);
   background:
-    radial-gradient(900px 500px at 12% 12%, var(--glow-a), transparent 62%),
-    radial-gradient(760px 440px at 84% 10%, var(--glow-b), transparent 58%),
-    radial-gradient(900px 700px at 50% 110%, var(--glow-c), transparent 60%),
+    radial-gradient(960px 560px at 12% 12%, var(--glow-a), transparent 60%),
+    radial-gradient(820px 480px at 84% 10%, var(--glow-b), transparent 56%),
+    radial-gradient(960px 760px at 50% 110%, var(--glow-c), transparent 58%),
     conic-gradient(from 210deg at 50% 50%, rgba(255, 255, 255, 0.1), transparent 18%, rgba(255, 255, 255, 0.06) 34%, transparent 52%, rgba(255, 255, 255, 0.08) 72%, transparent 100%),
     linear-gradient(180deg, var(--bg-top) 0%, var(--paper) 34%, var(--bg-bottom) 100%);
   overflow-x: hidden;
@@ -142,6 +142,19 @@ body::before {
   pointer-events: none;
   opacity: 0.45;
   z-index: 0;
+}
+
+/* Animated drifting glow orbs layer */
+@keyframes driftA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(3%, 2%) scale(1.04); }
+  66% { transform: translate(-2%, 4%) scale(0.97); }
+}
+
+@keyframes driftB {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40% { transform: translate(-3%, -2%) scale(1.05); }
+  75% { transform: translate(2%, 3%) scale(0.96); }
 }
 
 body::after {

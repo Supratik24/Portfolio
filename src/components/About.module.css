@@ -6,6 +6,30 @@
   display: grid;
   gap: var(--space-2);
   margin-bottom: var(--space-6);
+  position: relative;
+}
+
+.head::before {
+  content: "02";
+  position: absolute;
+  top: -8px;
+  right: 0;
+  font-family: var(--font-head);
+  font-size: clamp(60px, 8vw, 100px);
+  letter-spacing: -0.06em;
+  color: var(--ink);
+  opacity: 0.03;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.head::after {
+  content: "";
+  width: 120px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2), transparent);
 }
 
 .title {
@@ -77,6 +101,23 @@ html[data-theme="dark"] .value {
   padding: var(--space-5);
   display: grid;
   place-items: center;
+  animation: float 5s ease-in-out infinite;
+  position: relative;
+}
+
+.photoCard::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--radius-l) + 2px);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2), transparent 60%);
+  z-index: -1;
+  opacity: 0.5;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 .figure {

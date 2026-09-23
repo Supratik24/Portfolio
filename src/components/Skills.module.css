@@ -6,6 +6,30 @@
   display: grid;
   gap: var(--space-2);
   margin-bottom: var(--space-6);
+  position: relative;
+}
+
+.head::before {
+  content: "03";
+  position: absolute;
+  top: -8px;
+  right: 0;
+  font-family: var(--font-head);
+  font-size: clamp(60px, 8vw, 100px);
+  letter-spacing: -0.06em;
+  color: var(--ink);
+  opacity: 0.03;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+
+.head::after {
+  content: "";
+  width: 120px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2), transparent);
 }
 
 .title {
@@ -45,6 +69,20 @@ html[data-theme="dark"] .group {
   font-size: clamp(24px, 2.5vw, 30px);
   letter-spacing: -0.04em;
   font-family: var(--font-head);
+  display: inline-block;
+  position: relative;
+  padding-bottom: var(--space-2);
+}
+
+.groupTitle::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
 }
 
 .chips {
@@ -54,12 +92,14 @@ html[data-theme="dark"] .group {
 }
 
 .chip {
-  padding: 9px 13px;
+  padding: 9px 15px;
   border-radius: 999px;
   border: 1px solid var(--hairline);
   background: rgba(255, 255, 255, 0.52);
   font-size: var(--text-s);
-  transition: transform var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
+  font-weight: 500;
+  transition: transform var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out),
+    background var(--dur-2) var(--ease-out), color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 
 html[data-theme="dark"] .chip {
@@ -70,8 +110,15 @@ html[data-theme="dark"] .chip {
 }
 
 .chip:hover {
-  transform: translateY(-2px);
-  border-color: var(--hairline-2);
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 8px 22px rgba(108, 140, 255, 0.32);
+}
+
+html[data-theme="dark"] .chip:hover {
+  box-shadow: 0 12px 32px rgba(53, 80, 175, 0.4);
 }
 
 @media (min-width: 900px) {

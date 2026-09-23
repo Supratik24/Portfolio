@@ -1,9 +1,11 @@
 .reveal {
   opacity: 0;
-  transform: translateY(20px) scale(0.985);
-  filter: blur(10px);
-  transition: opacity var(--dur-3) var(--ease-out), transform var(--dur-3) var(--ease-out),
-    filter var(--dur-3) var(--ease-out);
+  transform: translateY(24px) scale(0.97);
+  filter: blur(6px);
+  transition:
+    opacity 0.75s var(--ease-out),
+    transform 0.75s var(--ease-out),
+    filter 0.6s var(--ease-out);
   will-change: opacity, transform, filter;
 }
 
@@ -17,6 +19,7 @@
   html:not([data-motion="full"]) .reveal {
     opacity: 1;
     transform: none;
+    filter: none;
     transition: none;
   }
 }
@@ -24,5 +27,6 @@
 html[data-motion="reduced"] .reveal {
   opacity: 1;
   transform: none;
+  filter: none;
   transition: none;
 }
