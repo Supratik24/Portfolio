@@ -1058,25 +1058,25 @@ export function AdminPage() {
 
                   {githubModalOpen && (
                     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.8)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
-                      <div style={{ background: "#111", border: "1px solid #333", borderRadius: "12px", padding: "1.5rem", width: "100%", maxWidth: "600px", maxHeight: "80vh", overflowY: "auto" }}>
+                      <div style={{ background: "var(--paper)", border: "1px solid var(--hairline)", borderRadius: "12px", padding: "1.5rem", width: "100%", maxWidth: "600px", maxHeight: "80vh", overflowY: "auto", boxShadow: "var(--shadow-2)" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
                           <h3 className={styles.h3} style={{ margin: 0 }}>Import GitHub Repo</h3>
                           <button className={styles.danger} onClick={() => setGithubModalOpen(false)}>Close</button>
                         </div>
                         {githubLoading ? (
-                          <p style={{ color: "#aaa" }}>Loading your GitHub repositories...</p>
+                          <p style={{ color: "var(--muted)" }}>Loading your GitHub repositories...</p>
                         ) : githubRepos.length === 0 ? (
-                          <p style={{ color: "#aaa" }}>No public repos found.</p>
+                          <p style={{ color: "var(--muted)" }}>No public repos found.</p>
                         ) : (
                           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                             {githubRepos.map(r => {
                               const slug = r.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
                               const added = siteProjects.some(p => p.slug === slug);
                               return (
-                                <div key={r.id} style={{ border: "1px solid #222", padding: "1rem", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <div key={r.id} style={{ border: "1px solid var(--hairline)", background: "var(--surface)", padding: "1rem", borderRadius: "8px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                   <div>
-                                    <div style={{ fontWeight: "bold", fontSize: "1.1rem" }}>{r.name}</div>
-                                    <div style={{ fontSize: "0.85rem", color: "#888", marginTop: "4px" }}>
+                                    <div style={{ fontWeight: "bold", fontSize: "1.1rem", color: "var(--ink)" }}>{r.name}</div>
+                                    <div style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: "4px" }}>
                                       {r.language || "No language"} {r.stargazers_count > 0 && `• ⭐ ${r.stargazers_count}`}
                                     </div>
                                   </div>
