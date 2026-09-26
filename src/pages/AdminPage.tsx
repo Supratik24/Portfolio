@@ -786,7 +786,7 @@ export function AdminPage() {
                     {posts.map((p) => (
                       <div key={p.id} className={styles.item}>
                         <button
-                          className={styles.itemBtn}
+                          className={[styles.itemBtn, activeId === p.id ? styles.itemBtnActive : ""].join(" ").trim()}
                           type="button"
                           onClick={() => setActiveId(p.id)}
                           disabled={loading}
@@ -816,7 +816,7 @@ export function AdminPage() {
                     {messages.map((m) => (
                       <div key={m.id} className={styles.item}>
                         <button
-                          className={styles.itemBtn}
+                          className={[styles.itemBtn, activeMessageId === m.id ? styles.itemBtnActive : ""].join(" ").trim()}
                           type="button"
                           onClick={() => setActiveMessageId(m.id)}
                           disabled={loading}
@@ -1022,7 +1022,7 @@ export function AdminPage() {
                       .map((group) => (
                         <div key={group} className={styles.item}>
                           <button
-                            className={styles.itemBtn}
+                            className={[styles.itemBtn, activeSkillGroup === group ? styles.itemBtnActive : ""].join(" ").trim()}
                             type="button"
                             onClick={() => setActiveSkillGroup(group)}
                             disabled={loading}
@@ -1100,7 +1100,7 @@ export function AdminPage() {
                     {siteProjects.map((p) => (
                       <div key={p.slug} className={styles.item}>
                         <button
-                          className={styles.itemBtn}
+                          className={[styles.itemBtn, activeProjectSlug === p.slug ? styles.itemBtnActive : ""].join(" ").trim()}
                           type="button"
                           onClick={() => setActiveProjectSlug(p.slug)}
                           disabled={loading}
