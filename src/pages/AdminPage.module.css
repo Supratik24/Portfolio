@@ -159,14 +159,16 @@ html[data-theme="dark"] .tabs {
 }
 
 .tabActive {
-  background: var(--ink);
-  color: var(--wash);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 4px 14px var(--accent-soft);
+  border: none;
 }
 html[data-theme="dark"] .tabActive {
-  background: var(--wash);
-  color: var(--ink);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  box-shadow: 0 4px 14px var(--accent-soft);
 }
 
 .label {
@@ -178,7 +180,8 @@ html[data-theme="dark"] .tabActive {
 }
 
 .input,
-.textarea {
+.textarea,
+select.input {
   width: 100%;
   border-radius: var(--radius-m);
   border: 1px solid var(--hairline-2);
@@ -188,6 +191,11 @@ html[data-theme="dark"] .tabActive {
   font-size: var(--text-m);
   color: var(--ink);
   transition: border-color var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out), background var(--dur-2);
+}
+
+select.input option {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 .textarea {
@@ -288,9 +296,21 @@ html[data-theme="dark"] .tabActive {
 
 .itemBtnActive {
   border-color: var(--accent);
-  background: var(--surface-strong);
-  transform: translateX(4px);
-  box-shadow: 0 0 0 1px var(--accent);
+  background: var(--accent-soft);
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px var(--accent-soft);
+  position: relative;
+}
+
+.itemBtnActive::before {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  bottom: -1px;
+  width: 4px;
+  background: var(--accent);
+  border-radius: 4px 0 0 4px;
 }
 
 .itemTitle {
