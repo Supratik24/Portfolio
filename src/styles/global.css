@@ -11,12 +11,12 @@
   --hairline: rgba(10, 14, 26, 0.09);
   --hairline-2: rgba(10, 14, 26, 0.16);
 
-  /* Electric blue accent */
-  --accent: #3b7ef8;
-  --accent-2: #7c5af8;
+  /* Dual accent: electric blue + orange */
+  --accent: #4f8ef7;
+  --accent-2: #ff8e66;
   --accent-ink: #ffffff;
-  --accent-soft: rgba(59, 126, 248, 0.12);
-  --accent-soft-2: rgba(124, 90, 248, 0.12);
+  --accent-soft: rgba(79, 142, 247, 0.14);
+  --accent-soft-2: rgba(255, 142, 102, 0.14);
   --surface: rgba(255, 255, 255, 0.68);
   --surface-strong: rgba(255, 255, 255, 0.9);
   --surface-deep: rgba(244, 247, 255, 0.97);
