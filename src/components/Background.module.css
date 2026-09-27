@@ -10,10 +10,10 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.16), transparent 16%),
-    radial-gradient(circle at 82% 14%, rgba(255, 255, 255, 0.11), transparent 16%),
-    radial-gradient(circle at 76% 76%, rgba(255, 255, 255, 0.08), transparent 14%),
-    radial-gradient(circle at 24% 76%, rgba(108, 140, 255, 0.1), transparent 18%);
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.22), transparent 16%),
+    radial-gradient(circle at 82% 14%, rgba(255, 255, 255, 0.14), transparent 16%),
+    radial-gradient(circle at 76% 76%, rgba(124, 90, 248, 0.08), transparent 14%),
+    radial-gradient(circle at 24% 76%, rgba(59, 126, 248, 0.1), transparent 18%);
   opacity: 0.95;
 }
 
@@ -22,22 +22,22 @@
   inset: 0;
   background: radial-gradient(
       620px 420px at var(--cursor-x, 22%) var(--cursor-y, 18%),
-      rgba(255, 255, 255, 0.24),
+      rgba(255, 255, 255, 0.3),
       transparent 62%
     ),
-    radial-gradient(620px 340px at 78% 26%, rgba(108, 140, 255, 0.18), transparent 65%),
-    radial-gradient(540px 360px at 16% 76%, rgba(255, 142, 102, 0.16), transparent 66%);
+    radial-gradient(620px 340px at 78% 26%, rgba(59, 126, 248, 0.14), transparent 65%),
+    radial-gradient(540px 360px at 16% 76%, rgba(124, 90, 248, 0.12), transparent 66%);
   opacity: 0.95;
 }
 
 html[data-theme="dark"] .cursorGlow {
   background: radial-gradient(
       760px 480px at var(--cursor-x, 22%) var(--cursor-y, 18%),
-      rgba(74, 129, 255, 0.24),
+      rgba(59, 126, 248, 0.22),
       transparent 62%
     ),
-    radial-gradient(660px 380px at 78% 26%, rgba(255, 113, 72, 0.2), transparent 65%),
-    radial-gradient(820px 480px at 16% 76%, rgba(111, 76, 255, 0.18), transparent 66%);
+    radial-gradient(660px 380px at 78% 26%, rgba(124, 90, 248, 0.18), transparent 65%),
+    radial-gradient(820px 480px at 16% 76%, rgba(59, 126, 248, 0.14), transparent 66%);
 }
 
 .shapeA,
@@ -45,7 +45,7 @@ html[data-theme="dark"] .cursorGlow {
   position: absolute;
   border-radius: 44% 56% 58% 42% / 43% 36% 64% 57%;
   filter: blur(calc(var(--blur) * 1.2));
-  opacity: 0.66;
+  opacity: 0.55;
   mix-blend-mode: screen;
 }
 
@@ -55,8 +55,8 @@ html[data-theme="dark"] .cursorGlow {
   left: -14%;
   top: 14%;
   background:
-    radial-gradient(circle at 34% 30%, rgba(255, 248, 240, 0.92), rgba(255, 248, 240, 0.18) 24%, transparent 56%),
-    radial-gradient(circle at 56% 48%, rgba(108, 140, 255, 0.52), transparent 72%);
+    radial-gradient(circle at 34% 30%, rgba(240, 244, 251, 0.9), rgba(240, 244, 251, 0.2) 24%, transparent 56%),
+    radial-gradient(circle at 56% 48%, rgba(59, 126, 248, 0.4), transparent 72%);
   animation: driftA 16s var(--ease-out) infinite alternate;
 }
 
@@ -66,8 +66,8 @@ html[data-theme="dark"] .cursorGlow {
   right: -12%;
   top: -6%;
   background:
-    radial-gradient(circle at 40% 42%, rgba(255, 250, 244, 0.9), rgba(255, 250, 244, 0.18) 22%, transparent 58%),
-    radial-gradient(circle at 58% 46%, rgba(255, 142, 102, 0.46), transparent 70%);
+    radial-gradient(circle at 40% 42%, rgba(240, 244, 251, 0.88), rgba(240, 244, 251, 0.2) 22%, transparent 58%),
+    radial-gradient(circle at 58% 46%, rgba(124, 90, 248, 0.38), transparent 70%);
   animation: driftB 18s var(--ease-out) infinite alternate;
 }
 
@@ -79,14 +79,14 @@ html[data-theme="dark"] .shapeB {
 
 html[data-theme="dark"] .shapeA {
   background:
-    radial-gradient(circle at 34% 30%, rgba(89, 168, 255, 0.3), rgba(89, 168, 255, 0.06) 24%, transparent 56%),
-    radial-gradient(circle at 56% 48%, rgba(108, 140, 255, 0.26), transparent 72%);
+    radial-gradient(circle at 34% 30%, rgba(59, 126, 248, 0.28), rgba(59, 126, 248, 0.06) 24%, transparent 56%),
+    radial-gradient(circle at 56% 48%, rgba(59, 126, 248, 0.22), transparent 72%);
 }
 
 html[data-theme="dark"] .shapeB {
   background:
-    radial-gradient(circle at 40% 42%, rgba(255, 124, 81, 0.28), rgba(255, 124, 81, 0.08) 22%, transparent 58%),
-    radial-gradient(circle at 58% 46%, rgba(126, 92, 255, 0.26), transparent 70%);
+    radial-gradient(circle at 40% 42%, rgba(124, 90, 248, 0.26), rgba(124, 90, 248, 0.08) 22%, transparent 58%),
+    radial-gradient(circle at 58% 46%, rgba(59, 126, 248, 0.22), transparent 70%);
 }
 
 .scanlines {
@@ -94,17 +94,17 @@ html[data-theme="dark"] .shapeB {
   inset: 0;
   background-image: linear-gradient(
     to bottom,
-    rgba(55, 39, 26, 0.025) 0px,
-    rgba(55, 39, 26, 0.025) 1px,
+    rgba(10, 14, 26, 0.02) 0px,
+    rgba(10, 14, 26, 0.02) 1px,
     transparent 3px
   );
   background-size: 100% 6px;
-  opacity: 0.18;
+  opacity: 0.15;
   mask-image: radial-gradient(80% 60% at 50% 0%, rgba(0, 0, 0, 0.8), transparent 65%);
 }
 
 html[data-theme="dark"] .scanlines {
-  opacity: 0.26;
+  opacity: 0.22;
 }
 
 @keyframes driftA {

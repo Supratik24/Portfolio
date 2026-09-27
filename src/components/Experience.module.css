@@ -1,78 +1,115 @@
 .section {
-  padding: var(--space-8) 0;
+  padding: var(--space-9) 0;
+  width: min(var(--grid-max), calc(100% - 2 * var(--grid-gutter)));
+  margin: 0 auto;
 }
 
 .head {
   display: grid;
   gap: var(--space-2);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-7);
+  position: relative;
+}
+
+.head::after {
+  content: "";
+  width: 48px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
 }
 
 .title {
   margin: 0;
   font-family: var(--font-head);
-  font-size: var(--text-2xl);
-  letter-spacing: -0.02em;
+  font-size: var(--text-3xl);
+  letter-spacing: -0.03em;
+  color: var(--ink);
 }
 
 .sub {
   margin: 0;
   color: var(--muted);
-  max-width: 70ch;
+  max-width: 60ch;
   font-size: var(--text-m);
+  line-height: 1.65;
 }
 
+/* Timeline */
 .timeline {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  gap: var(--space-4);
+  gap: 0;
 }
 
 .item {
   display: grid;
-  grid-template-columns: 18px 1fr;
+  grid-template-columns: 32px 1fr;
   gap: var(--space-4);
   align-items: stretch;
 }
 
+/* Rail — vertical connecting line */
 .rail {
   position: relative;
-  display: grid;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: var(--space-5);
 }
 
 .rail::before {
   content: "";
   position: absolute;
-  top: 0;
+  top: 26px;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(180deg, rgba(125, 151, 116, 0.22), rgba(84, 67, 53, 0.16));
+  background: linear-gradient(180deg, var(--accent), rgba(59, 126, 248, 0.1));
 }
 
+/* Hide line for last item */
+.item:last-child .rail::before {
+  display: none;
+}
+
+/* Glowing blue dot */
 .dot {
-  margin-top: 18px;
-  width: 12px;
-  height: 12px;
+  margin-top: 20px;
+  width: 14px;
+  height: 14px;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.58);
+  background: var(--accent);
+  border: 3px solid var(--paper);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 12px rgba(59, 126, 248, 0.4);
   position: relative;
   z-index: 1;
+  flex-shrink: 0;
 }
 
+/* Experience card */
 .card {
   border-radius: var(--radius-l);
-  border: 1px solid var(--hairline);
-  background: linear-gradient(180deg, var(--surface-strong), rgba(255, 246, 238, 0.62));
-  box-shadow: var(--shadow-1);
-  padding: var(--space-5);
+  border: 1px solid var(--hairline-2);
+  background: var(--surface-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px var(--shadow-color);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-5);
+  transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
+}
+
+.card:hover {
+  transform: translateX(4px);
+  box-shadow: 0 8px 32px rgba(59, 126, 248, 0.1);
+  border-color: rgba(59, 126, 248, 0.22);
 }
 
 html[data-theme="dark"] .card {
-  background: linear-gradient(180deg, rgba(21, 25, 33, 0.84), rgba(18, 22, 30, 0.7));
+  background: rgba(8, 18, 40, 0.8);
+  border-color: rgba(59, 126, 248, 0.1);
 }
 
 .top {
@@ -81,31 +118,47 @@ html[data-theme="dark"] .card {
   align-items: baseline;
   justify-content: space-between;
   gap: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
 .company {
   font-family: var(--font-head);
-  font-size: clamp(26px, 2.8vw, 32px);
+  font-size: clamp(22px, 2.6vw, 28px);
   letter-spacing: -0.04em;
+  color: var(--ink);
 }
 
 .dates {
-  font-size: var(--text-s);
-  letter-spacing: 0.12em;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 12px;
+  border-radius: 999px;
 }
 
 .role {
-  margin-top: var(--space-2);
+  margin-bottom: var(--space-3);
   color: var(--muted);
-  font-size: var(--text-l);
+  font-size: var(--text-m);
+  font-weight: 500;
 }
 
 .achievements {
-  margin: var(--space-4) 0 0;
-  padding-left: 18px;
+  margin: 0;
+  padding: 0;
+  padding-left: 16px;
   display: grid;
   gap: var(--space-2);
   color: var(--ink);
+  font-size: var(--text-m);
+  line-height: 1.6;
+}
+
+.achievements li::marker {
+  color: var(--accent);
 }
