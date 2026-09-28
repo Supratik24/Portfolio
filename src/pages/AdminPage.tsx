@@ -669,39 +669,56 @@ export function AdminPage() {
   return (
     <div className={styles.wrap}>
       <div className={styles.topbar}>
-        <a className={styles.back} href="/">
-          Back to site
-        </a>
-        {token ? (
-          <button
-            className={styles.logout}
-            type="button"
-            onClick={() => {
-              setToken("");
-              setTokenState("");
-              resetPostForm();
-              resetSkillForm();
-              resetProjectForm();
-              setPosts([]);
-              setMessages([]);
-              setActiveMessageId(null);
-              setSiteProfile(null);
-              setSiteSkills({});
-              setSiteProjects([]);
-              setProfileJson("{}");
-              setSkillsJson("{}");
-              setProjectsJson("[]");
-            }}
-          >
-            Log out
-          </button>
-        ) : null}
+        <div className={styles.topbarBrand}>
+          <div className={styles.topbarMark}>
+            <div className={styles.topbarMarkIcon} />
+          </div>
+          <div>
+            <div className={styles.topbarTitle}>Admin Portal</div>
+            <div className={styles.topbarSub}>Content Management</div>
+          </div>
+        </div>
+        <div className={styles.topbarActions}>
+          <a className={styles.back} href="/">
+            ← Site
+          </a>
+          {token ? (
+            <button
+              className={styles.logout}
+              type="button"
+              onClick={() => {
+                setToken("");
+                setTokenState("");
+                resetPostForm();
+                resetSkillForm();
+                resetProjectForm();
+                setPosts([]);
+                setMessages([]);
+                setActiveMessageId(null);
+                setSiteProfile(null);
+                setSiteSkills({});
+                setSiteProjects([]);
+                setProfileJson("{}");
+                setSkillsJson("{}");
+                setProjectsJson("[]");
+              }}
+            >
+              Log out
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <main className={styles.main}>
         <header className={styles.head}>
           <h1 className={styles.h1}>Admin</h1>
           <p className={styles.sub}>Manage profile, posts, skills, and projects stored in MongoDB.</p>
+          {token ? (
+            <div className={styles.statusPill}>
+              <span className={styles.statusDot} />
+              Connected
+            </div>
+          ) : null}
         </header>
 
         {error ? <div className={styles.error}>{error}</div> : null}
